@@ -3,7 +3,7 @@ import datetime
 import gzip
 import base64
 import urllib.parse
-from lib.MD5 import DysonSphereMD5
+from lib.dspbptk.MD5 import DysonSphereMD5
 from DysonNode import DysonNode
 from BinaryWriter import BinaryWriter
 
