@@ -5,8 +5,20 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 class Polyhedron:
 
     def __init__(self, vertices, faces):
-        self.vertices = vertices
-        self.faces = faces
+        self._vertices = vertices
+        self._faces = faces
+
+    def __init__(self, vertices, faces):
+        self._vertices = vertices
+        self._faces = faces
+
+    @property
+    def vertices(self):
+        return self._vertices
+
+    @property
+    def faces(self):
+        return self._faces
 
     @staticmethod
     def icosahedron_vertices():
@@ -76,22 +88,22 @@ class Polyhedron:
 
     def kis_operator(self):
         new_faces = []
-        new_vertices = list(self.vertices)  # Make a copy of the original vertices
+        new_vertices = list(self._vertices)  # Make a copy of the original vertices
 
-        for face in self.faces:
-            face_centroid = self.centroid([self.vertices[v] for v in face])
+        for face in self._faces:
+            face_centroid = self.centroid([self._vertices[v] for v in face])
             centroid_idx = len(new_vertices)
             new_vertices.append(face_centroid)
 
             new_tri_faces = [(face[i], face[(i + 1) % len(face)], centroid_idx) for i in range(len(face))]
             new_faces.extend(new_tri_faces)
 
-        self.vertices = new_vertices
-        self.faces = new_faces
+        self._vertices = new_vertices
+        self._faces = new_faces
 
     def coxeter_operator(self):
-        vertices = self.vertices
-        faces = self.faces
+        vertices = self._vertices
+        faces = self._faces
         new_faces = []
         new_vertices = list(vertices)  # Make a copy of the original vertices
         edge_midpoint_indices = {}
@@ -118,8 +130,8 @@ class Polyhedron:
             ]
 
             new_faces.extend(new_tri_faces)
-        self.vertices = new_vertices
-        self.faces = new_faces
+        self._vertices = new_vertices
+        self._faces = new_faces
 
     @staticmethod
     def project_to_sphere(vertices, radius=1):
@@ -132,20 +144,20 @@ class Polyhedron:
         return projected_vertices
 
     def print_polyhedron(self, radius=1):
-        vertices = self.project_to_sphere(self.vertices, radius)
+        vertices = self.project_to_sphere(self._vertices, radius)
         print("Index |        X        |        Y        |        Z        ")
         print("------|-----------------|-----------------|-----------------")
         for idx, vertex in enumerate(vertices):
             print("{:5d} | {: 15.8f} | {: 15.8f} | {: 15.8f}".format(idx, *vertex))
 
     def plot_polyhedron(self):
-        vertices = self.project_to_sphere(self.vertices)
+        vertices = self.project_to_sphere(self._vertices)
 
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
         # Create a list of polygons for each face
-        polygons = [[vertices[vertex_idx] for vertex_idx in face] for face in self.faces]
+        polygons = [[vertices[vertex_idx] for vertex_idx in face] for face in self._faces]
 
         # Create a Poly3DCollection object
         poly3d = Poly3DCollection(polygons, edgecolor='k', lw=1, alpha=0.9)
@@ -170,6 +182,17 @@ class Polyhedron:
 
         # View the plot from different angles
         ax.view_init(elev=20, azim=-35)
+
+        num_vertices = len(self._vertices)
+        num_faces = len(self._faces)
+
+        plt.annotate(
+            f'Vertices: {num_vertices}\nFaces: {num_faces}',
+            xy=(0, 1), xycoords='axes fraction',
+            xytext=(5, -5), textcoords='offset points',
+            fontsize=12,
+            ha='left', va='top'
+        )
 
         plt.show()
 
