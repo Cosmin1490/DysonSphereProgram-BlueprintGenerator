@@ -99,6 +99,14 @@ class Polyhedron:
             projected_vertices.append((x_proj, y_proj, z_proj))
         return projected_vertices
 
+
+    def print_polyhedron(self, radius=1):
+        vertices = self.project_to_sphere(self.vertices, radius)
+        print("Index |        X        |        Y        |        Z        ")
+        print("------|-----------------|-----------------|-----------------")
+        for idx, vertex in enumerate(vertices):
+            print("{:5d} | {: 15.8f} | {: 15.8f} | {: 15.8f}".format(idx, *vertex))
+
     def plot_polyhedron(self):
         vertices = self.project_to_sphere(self.vertices)
 
@@ -119,9 +127,9 @@ class Polyhedron:
         ax.scatter(x, y, z, color='r', s=3)
 
         # Set limits and labels
-        ax.set_xlim([-2, 2])
-        ax.set_ylim([-2, 2])
-        ax.set_zlim([-2, 2])
+        ax.set_xlim([-1, 1])
+        ax.set_ylim([-1, 1])
+        ax.set_zlim([-1, 1])
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Z')
@@ -137,4 +145,5 @@ class Polyhedron:
 
 icosahedron = Polyhedron.create_icosahedron()
 icosahedron.divide_faces()
+icosahedron.print_polyhedron()
 icosahedron.plot_polyhedron()
