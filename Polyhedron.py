@@ -58,6 +58,12 @@ class Polyhedron:
         ]
         return faces
 
+    @classmethod
+    def create_icosahedron(cls):
+        icosahedron_verts = cls.icosahedron_vertices()
+        icosahedron_faces = cls.icosahedron_faces()
+        return cls(icosahedron_verts, icosahedron_faces)
+
     @staticmethod
     def centroid(points):
         num_points = len(points)
@@ -68,7 +74,7 @@ class Polyhedron:
             z_sum += point[2]
         return (x_sum / num_points, y_sum / num_points, z_sum / num_points)
 
-    def divide_faces(self):
+    def kis_operator(self):
         new_faces = []
         new_vertices = list(self.vertices)  # Make a copy of the original vertices
 
@@ -83,11 +89,37 @@ class Polyhedron:
         self.vertices = new_vertices
         self.faces = new_faces
 
-    @classmethod
-    def create_icosahedron(cls):
-        icosahedron_verts = cls.icosahedron_vertices()
-        icosahedron_faces = cls.icosahedron_faces()
-        return cls(icosahedron_verts, icosahedron_faces)
+    def coxeter_operator(self):
+        vertices = self.vertices
+        faces = self.faces
+        new_faces = []
+        new_vertices = list(vertices)  # Make a copy of the original vertices
+        edge_midpoint_indices = {}
+        for face in faces:
+            face_edge_midpoints = []
+            for i in range(len(face)):
+                v1 = face[i]
+                v2 = face[(i + 1) % len(face)]
+
+                edge_key = tuple(sorted([v1, v2]))
+                if edge_key not in edge_midpoint_indices:
+                    midpoint = self.centroid([vertices[v1], vertices[v2]])
+                    midpoint_idx = len(new_vertices)
+                    edge_midpoint_indices[edge_key] = midpoint_idx
+                    new_vertices.append(midpoint)
+
+                face_edge_midpoints.append(edge_midpoint_indices[edge_key])
+
+            new_tri_faces = [
+                (face[0], face_edge_midpoints[0], face_edge_midpoints[2]),
+                (face[1], face_edge_midpoints[1], face_edge_midpoints[0]),
+                (face[2], face_edge_midpoints[2], face_edge_midpoints[1]),
+                (face_edge_midpoints[0], face_edge_midpoints[1], face_edge_midpoints[2])
+            ]
+
+            new_faces.extend(new_tri_faces)
+        self.vertices = new_vertices
+        self.faces = new_faces
 
     @staticmethod
     def project_to_sphere(vertices, radius=1):
@@ -98,7 +130,6 @@ class Polyhedron:
 
             projected_vertices.append((x_proj, y_proj, z_proj))
         return projected_vertices
-
 
     def print_polyhedron(self, radius=1):
         vertices = self.project_to_sphere(self.vertices, radius)
@@ -143,7 +174,9 @@ class Polyhedron:
         plt.show()
 
 
+# Example usage:
 icosahedron = Polyhedron.create_icosahedron()
-icosahedron.divide_faces()
-icosahedron.print_polyhedron()
+#icosahedron.kis_operator()
+icosahedron.coxeter_operator()
+# icosahedron.print_polyhedron()
 icosahedron.plot_polyhedron()
