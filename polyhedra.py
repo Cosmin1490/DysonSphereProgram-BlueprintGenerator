@@ -240,10 +240,6 @@ def project_to_sphere2(vertices, radius=2):
         length = math.sqrt(x**2 + y**2 + z**2)
         x_proj, y_proj, z_proj = radius * x / length, radius * y / length, radius * z / length
 
-        # Convert to latitude and longitude
-        latitude = math.degrees(math.asin(z_proj / radius))
-        longitude = math.degrees(math.atan2(y_proj, x_proj))
-
         projected_vertices.append((x_proj, y_proj, z_proj))
     return projected_vertices
 
@@ -285,7 +281,7 @@ polygons = [[vertices[vertex_idx] for vertex_idx in face] for face in faces]
 poly3d = Poly3DCollection(polygons, edgecolor='k', lw=1, alpha=0.9)
 
 # Add the polygons to the axes
-# ax.add_collection3d(poly3d)
+ax.add_collection3d(poly3d)
 
 # Draw the vertices
 x, y, z = zip(*vertices)
