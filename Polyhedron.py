@@ -1,4 +1,5 @@
 import math
+import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
@@ -134,6 +135,55 @@ class Polyhedron:
         self._faces = new_faces
 
     @staticmethod
+    def normalize_vertex(vertex):
+        norm = math.sqrt(vertex[0]**2 + vertex[1]**2 + vertex[2]**2)
+        return (vertex[0]/norm, vertex[1]/norm, vertex[2]/norm)
+
+    @staticmethod
+    def angle(a, b):
+        dx, dy, dz = a[0] - b[0], a[1] - b[1], a[2] - b[2]
+        return math.atan2(dy, dx)
+
+    @classmethod
+    def angle_between_vectors(cls, v1, v2, ref):
+        v1_normalized = cls.normalize_vertex(v1 - ref)
+        v2_normalized = cls.normalize_vertex(v2 - ref)
+        cosine_angle = np.dot(v1_normalized, v2_normalized)
+        angle = np.arccos(np.clip(cosine_angle, -1, 1))
+        return angle
+
+    @classmethod
+    def sort_adjacent_faces(cls, vertices, faces, common_vertex):
+        if len(faces) <= 1:
+            return faces
+
+        ref_vector = vertices[faces[0]]
+        sorted_faces = [faces[0]]
+        remaining_faces = faces[1:]
+
+        while remaining_faces:
+            face_angles = [(face, cls.angle_between_vectors(ref_vector, vertices[face], common_vertex)) for face in remaining_faces]
+            next_face, _ = min(face_angles, key=lambda x: x[1])
+            ref_vector = vertices[next_face]
+            sorted_faces.append(next_face)
+            remaining_faces.remove(next_face)
+
+        return sorted_faces
+
+    def dual_operator(self):
+        vertices = [np.array(v) for v in self._vertices]  # Convert input vertices to numpy arrays
+        dual_vertices = [self.centroid([vertices[i] for i in face]) for face in self._faces]
+        vertex_to_adjacent_faces = {i: [f_idx for f_idx, f in enumerate(self._faces) if i in f] for i in range(len(vertices))}
+
+        dual_faces = []
+        for vertex_index, adjacent_faces in vertex_to_adjacent_faces.items():
+            sorted_faces = self.sort_adjacent_faces(dual_vertices, adjacent_faces, vertices[vertex_index])
+            dual_faces.append(sorted_faces)
+
+        self._vertices = dual_vertices
+        self._faces = dual_faces
+
+    @staticmethod
     def project_to_sphere(vertices, radius=1):
         projected_vertices = []
         for x, y, z in vertices:
@@ -199,7 +249,8 @@ class Polyhedron:
 
 # Example usage:
 icosahedron = Polyhedron.create_icosahedron()
-#icosahedron.kis_operator()
 icosahedron.coxeter_operator()
-# icosahedron.print_polyhedron()
+icosahedron.kis_operator()
+icosahedron.dual_operator()
+icosahedron.print_polyhedron()
 icosahedron.plot_polyhedron()
