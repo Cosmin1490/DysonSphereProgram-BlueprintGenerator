@@ -4,10 +4,12 @@ import gzip
 import base64
 import urllib.parse
 from lib.dspbptk.MD5 import DysonSphereMD5
-from DysonNode import DysonNode
-from DysonFrame import DysonFrame
-from DysonShell import DysonShell
+
 from BinaryWriter import BinaryWriter
+from DysonFrame import DysonFrame
+from DysonNode import DysonNode
+from DysonShell import DysonShell
+from DysonSphereLayer import DysonSphereLayer
 
 
 def from_blueprint_string(bp_string, validate_hash = True):
@@ -24,6 +26,9 @@ def from_blueprint_string(bp_string, validate_hash = True):
 with open("bp.txt") as f:
     from_blueprint_string(f.read())
 
+
+
+
 with open('bpgen.txt', 'w') as f:
     node = DysonNode.create_with_defaults(1, (0.0, 1.0, 2.0))
     writer = BinaryWriter(f, hex_output = True)
@@ -37,6 +42,12 @@ with open('bpgen2.txt', 'w') as f:
 
 with open('bpgen3.txt', 'w') as f:
     node = DysonShell.create_with_defaults(1, [1, 2, 3])
+    writer = BinaryWriter(f, hex_output = True)
+    node.export_as_blueprint(writer)
+    writer.close()
+
+with open('bpgen4.txt', 'w') as f:
+    node = DysonSphereLayer.create_with_defaults([DysonNode.create_with_defaults(1, (0.0, 1.0, 2.0)), DysonNode.create_with_defaults(2, (5.0, 1.0, 2.0)), DysonNode.create_with_defaults(3, (10.0, 1.0, 2.0))], [], [])
     writer = BinaryWriter(f, hex_output = True)
     node.export_as_blueprint(writer)
     writer.close()

@@ -1,6 +1,6 @@
 nodes: [(0, 0), (N15, E15), (N15, W15)] edges: []
-00000000 // ?
-01000000 // 1 header
+00000000 // 0 header DysonSphereBlueprint Header
+01000000 // 1 header DysonSphereLayer header
 40000000 // node capacity
 04000000 // node cursor
 00000000 // node recycle cursor
@@ -17,8 +17,8 @@ nodes: [(0, 0), (N15, E15), (N15, W15)] edges: []
 1d000000 // rid // can be made equal to index
 00000000 // frame turn
 00000000 // shell turn
-1e000000 // sp req // can be set to 30 if no edges
-00000000 // cp req // can always be 0
+1e000000 // sp req // can be set to 30 if no edges // recalculated anyway
+00000000 // cp req // can always be 0 // recalculated anyway
 00000000 // rgba // can always be zero
 02000000 // index
 05000000 // 5 header
