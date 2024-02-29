@@ -41,18 +41,21 @@ class DysonSphereLayer:
         w.write(self.compute_capacity(len(self._nodes) + 1))
         w.write(len(self._nodes) + 1)
         w.write(0)
-        for node in self._nodes:
+        for index, node in enumerate(self._nodes):
+            w.write(index + 1)
             node.export_as_blueprint(w)
         w.write(self.compute_capacity(len(self._frames) + 1))
         w.write(len(self._frames) + 1)
         w.write(0)
-        for frame in self._frames:
+        for index, frame in enumerate(self._frames):
+            w.write(index + 1)
             frame.export_as_blueprint(w)
 
         w.write(self.compute_capacity(len(self._shells) + 1))
         w.write(len(self._shells) + 1)
         w.write(0)
-        for shell in self._shells:
+        for index, shell in enumerate(self._shells):
+            w.write(index + 1)
             shell.export_as_blueprint(w)
         w.write(self._paintingGridMode)
         w.write(False)

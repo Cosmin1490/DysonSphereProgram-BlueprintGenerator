@@ -248,9 +248,10 @@ class Polyhedron:
 
 
 # Example usage:
-icosahedron = Polyhedron.create_icosahedron()
-icosahedron.coxeter_operator()
-icosahedron.kis_operator()
-icosahedron.dual_operator()
-icosahedron.print_polyhedron()
-icosahedron.plot_polyhedron()
+#icosahedron = Polyhedron.create_icosahedron()
+#icosahedron.coxeter_operator()
+#icosahedron.coxeter_operator()
+#icosahedron.kis_operator()
+#icosahedron.dual_operator()
+#icosahedron.print_polyhedron()
+#icosahedron.plot_polyhedron()

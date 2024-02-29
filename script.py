@@ -53,10 +53,26 @@ with open("bp2.txt") as f:
 #    writer.close()
 
 
+from Polyhedron import Polyhedron
+
+icosahedron = Polyhedron.create_icosahedron()
+icosahedron.coxeter_operator()
+icosahedron.coxeter_operator()
+icosahedron.dual_operator()
+
+
+nodes = []
+for index, vertex in enumerate(icosahedron.vertices):
+    nodes.append(DysonNode.create_with_defaults(index + 1, vertex))
+
 memory_stream = io.BytesIO()
 
+
+
 with memory_stream as f:
-    node = DysonSphereLayer.create_with_defaults([DysonNode.create_with_defaults(1, (0.0, 1.0, 0.0)), DysonNode.create_with_defaults(2, (1.0, 0.0, 0.0)), DysonNode.create_with_defaults(3, (0.0, 0.0, 1.0))], [], [])
+    # node = DysonSphereLayer.create_with_defaults([DysonNode.create_with_defaults(1, (0.0, 1.0, 0.0)), DysonNode.create_with_defaults(2, (1.0, 0.0, 0.0)), DysonNode.create_with_defaults(3, (0.0, 0.0, 1.0))], [], [])
+    #node = DysonSphereLayer.create_with_defaults([DysonNode.create_with_defaults(1, (1.0, 0.0, 0.0))], [], [])
+    node = DysonSphereLayer.create_with_defaults(nodes, [], [])
     writer = BinaryWriter(f)
     writer.write(0)
     node.export_as_blueprint(writer)
@@ -64,11 +80,9 @@ with memory_stream as f:
 
     compressed_content = gzip.compress(memory_stream_content)
     encoded_content = base64.b64encode(compressed_content).decode("utf-8")
-    writer.close()
     to_hash = "DYBP:0,638446503868746433,0.10.29.21950,1,90\"" + encoded_content
-    hash_value = DysonSphereMD5(DysonSphereMD5.Variant.MD5F).update(to_hash.encode("utf-8")).hexdigest().upper()
-    print(to_hash + "\"" + hash_value)
-
+    hash_value = DysonSphereMD5(DysonSphereMD5.Variant.MD5F).update(to_hash.encode("utf-8")).hexdigest()
+    print(to_hash + "\"" + hash_value.upper())
 
 # compressed_data = gzip.compress(self._data)
 # b64_data = base64.b64encode(compressed_data).decode("utf-8")
