@@ -9,10 +9,6 @@ class Polyhedron:
         self._vertices = vertices
         self._faces = faces
 
-    def __init__(self, vertices, faces):
-        self._vertices = vertices
-        self._faces = faces
-
     @property
     def vertices(self):
         return self._vertices
@@ -20,6 +16,15 @@ class Polyhedron:
     @property
     def faces(self):
         return self._faces
+
+    @property
+    def edges(self):
+        edges_set = set()
+        for face in self._faces:
+            for i in range(len(face)):
+                edge = tuple(sorted((face[i], face[(i + 1) % len(face)])))
+                edges_set.add(edge)
+        return list(edges_set)
 
     @staticmethod
     def icosahedron_vertices():
