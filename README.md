@@ -71,8 +71,9 @@ The main entry point of the project is `script.py`.
 
 ## Contributing
 
-If you'd like to contribute to this project, feel free to fork the repository and submit a pull request. I welcome any improvements or bug fixes.
+If you'd like to contribute to this project, feel free to fork the repository and submit a pull request. I welcome any improvements or bug fixes. Please read [Contributing Guidelines](CONTRIBUTING.md) for information on how to report bugs, request features, submit pull requests, and more
 
 ## License
 
 This project is licensed under the GNU General Public License v3.0. See the LICENSE file for more information.
+
