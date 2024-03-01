@@ -82,6 +82,22 @@ class Polyhedron:
         icosahedron_faces = cls.icosahedron_faces()
         return cls(icosahedron_verts, icosahedron_faces)
 
+    @classmethod
+    def create_from_polyhedronisme_obj_file(cls, file_content):
+        lines = file_content.split("\n")
+        vertices = []
+        faces = []
+
+        for line in lines:
+            if line.startswith("v "):
+                v = [float(x) for x in line.split()[1:]]
+                vertices.append(v)
+            elif line.startswith("f "):
+                f = [int(x.split("//")[0]) - 1 for x in line.split()[1:]]
+                faces.append(f)
+
+        return cls(vertices, faces)
+
     @staticmethod
     def centroid(points):
         num_points = len(points)
@@ -251,12 +267,3 @@ class Polyhedron:
 
         plt.show()
 
-
-# Example usage:
-#icosahedron = Polyhedron.create_icosahedron()
-#icosahedron.coxeter_operator()
-#icosahedron.coxeter_operator()
-#icosahedron.kis_operator()
-#icosahedron.dual_operator()
-#icosahedron.print_polyhedron()
-#icosahedron.plot_polyhedron()
