@@ -52,7 +52,11 @@ This code generates an icosahedron and applies Conway Polyhedral Notation operat
 - To change the base polyhedron, replace `Polyhedron.create_icosahedron()` with the appropriate method for the desired polyhedron.
 - To apply a different Conway operation, call the corresponding method on the polyhedron object.
 
-For example, to create a dodecahedron and apply the 'kis' operation twice:
+For example, to create a dodecahedron :
+```python
+polyhedron = Polyhedron.create_icosahedron()
+polyhedron.dual_operator()
+```
 
 ## Structure
 
