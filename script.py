@@ -12,15 +12,15 @@ from DysonShell import DysonShell
 from DysonSphereLayer import DysonSphereLayer
 from Polyhedron import Polyhedron
 
-polyhedron = Polyhedron.create_icosahedron()
-polyhedron.coxeter_operator()
-polyhedron.coxeter_operator()
-polyhedron.dual_operator()
-
-#with open("poly.obj", "r") as file:
-#    file_content = file.read()
+#polyhedron = Polyhedron.create_icosahedron()
+#polyhedron.coxeter_operator()
+#polyhedron.coxeter_operator()
+#polyhedron.dual_operator()
 #
-#polyhedron = Polyhedron.create_from_polyhedronisme_obj_file(file_content)
+with open("./polyhedronisme-A10dwdI.obj", "r") as file:
+    file_content = file.read()
+
+polyhedron = Polyhedron.create_from_polyhedronisme_obj_file(file_content)
 
 nodes = []
 frames = []
