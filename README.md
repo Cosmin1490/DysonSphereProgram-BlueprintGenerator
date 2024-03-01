@@ -71,8 +71,24 @@ The main entry point of the project is `script.py`.
 
 ## Contributing
 
-If you'd like to contribute to this project, feel free to fork the repository and submit a pull request. I welcome any improvements or bug fixes.
+If you'd like to contribute to this project, feel free to fork the repository and submit a pull request. I welcome any improvements or bug fixes. Please read [Contributing Guidelines](CONTRIBUTING.md) for information on how to report bugs, request features, submit pull requests, and more
 
 ## License
 
 This project is licensed under the GNU General Public License v3.0. See the LICENSE file for more information.
+
+# Dyson Sphere Program - Blueprint Generator
+
+This repository contains the source code and resources for the Dyson Sphere Program Blueprint Generator, a tool designed to help players create and share blueprints for use in the game.
+
+## Getting Started
+
+To get started, download the latest release or clone the repository to your local machine. Follow the installation and usage instructions provided in the [documentation](DOCUMENTATION.md).
+
+## Contributing
+
+We welcome contributions from the community! If you're interested in contributing, please read our [Contributing Guidelines](CONTRIBUTING.md) for information on how to report bugs, request features, submit pull requests, and more. We appreciate your help in making this project even better.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
