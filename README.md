@@ -49,13 +49,26 @@ icosahedron.dual_operator()
 
 This code generates an icosahedron and applies Conway Polyhedral Notation operations to create a new polyhedron. The result can be visualized [here](https://levskaya.github.io/polyhedronisme/?recipe=A10duuI).
 
-- To change the base polyhedron, replace `Polyhedron.create_icosahedron()` with the appropriate method for the desired polyhedron.
-- To apply a different Conway operation, call the corresponding method on the polyhedron object.
+To change the base polyhedron, replace `Polyhedron.create_icosahedron()` with the appropriate method for the desired polyhedron.
 
-For example, to create a dodecahedron :
+To apply a different Conway operation, call the corresponding method on the polyhedron object.
+
+For example, to create a dodecahedron:
+
 ```python
 polyhedron = Polyhedron.create_icosahedron()
 polyhedron.dual_operator()
+```
+
+**Additional Changes:**
+
+`Polyhedron` class supports the obj format exported from [Polyhedronisme](https://levskaya.github.io/polyhedronisme/?recipe=A10duuI). This functionality can be used like so:
+
+```python
+with open(filepath, "r") as file:
+    file_content = file.read()
+
+polyhedron = Polyhedron.create_from_polyhedronisme_obj_file(file_content)
 ```
 
 ## Structure
