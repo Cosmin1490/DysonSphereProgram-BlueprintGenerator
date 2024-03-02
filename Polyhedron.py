@@ -204,6 +204,52 @@ class Polyhedron:
         self._vertices = dual_vertices
         self._faces = dual_faces
 
+    def tessellate_edges(self, num_nodes=1):
+        # Initialize new vertices and faces lists
+        new_vertices = self._vertices.copy()
+        new_faces = []
+
+        # Create a dictionary to store new vertices indices for each edge
+        edge_new_vertices = {}
+
+        # Iterate over faces
+        for face in self._faces:
+            new_face = []
+            for i in range(len(face)):
+                # Get the two vertices forming the current edge
+                v1 = self._vertices[face[i]]
+                v2 = self._vertices[face[(i + 1) % len(face)]]
+
+                # Get the sorted edge tuple
+                edge = tuple(sorted((face[i], face[(i + 1) % len(face)])))
+
+                # Calculate new vertex positions if not already done
+                if edge not in edge_new_vertices:
+                    new_vertex_indices = []
+                    for j in range(1, num_nodes + 1):
+                        new_vertex = np.array(v1) + (np.array(v2) - np.array(v1)) * j / (num_nodes + 1)
+                        new_vertex_index = len(new_vertices)
+                        new_vertices.append(new_vertex)
+                        new_vertex_indices.append(new_vertex_index)
+
+                    # Store the new vertex indices in the dictionary
+                    edge_new_vertices[edge] = tuple(new_vertex_indices)
+
+                # Get new vertex indices from the dictionary
+                new_vertex_indices = edge_new_vertices[edge]
+
+                # Add new vertex indices to the new face
+                new_face.append(face[i])
+                for index in new_vertex_indices:
+                    new_face.append(index)
+
+            # Replace the original face with the new face
+            new_faces.append(new_face)
+
+        # Update the polyhedron with the new vertices and faces
+        self._vertices = new_vertices
+        self._faces = new_faces
+
     @staticmethod
     def project_to_sphere(vertices, radius=1):
         projected_vertices = []
