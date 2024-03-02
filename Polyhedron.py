@@ -240,8 +240,12 @@ class Polyhedron:
 
                 # Add new vertex indices to the new face
                 new_face.append(face[i])
-                for index in new_vertex_indices:
-                    new_face.append(index)
+
+                # Check if the first new vertex is closer to v1 or v2
+                if np.linalg.norm(new_vertices[new_vertex_indices[0]] - v1) < np.linalg.norm(new_vertices[new_vertex_indices[0]] - v2):
+                    new_face.extend(new_vertex_indices)
+                else:
+                    new_face.extend(reversed(new_vertex_indices))
 
             # Replace the original face with the new face
             new_faces.append(new_face)
