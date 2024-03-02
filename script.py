@@ -20,11 +20,9 @@ polyhedron.coxeter_operator()
 polyhedron.dual_operator()
 polyhedron.tessellate_edges(3)
 
-#with open("poly.obj", "r") as file:
-#    file_content = file.read()
-#
-#polyhedron = Polyhedron.create_from_polyhedronisme_obj_file(file_content)
-
+# with open("./polyhedronisme/polyhedronisme-A10wD.obj", "r") as file:
+#     file_content = file.read()
+#     polyhedron = Polyhedron.create_from_polyhedronisme_obj_file(file_content)
 
 #polyhedron.plot_polyhedron()
 
