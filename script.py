@@ -8,6 +8,7 @@ from lib.dspbptk.MD5 import DysonSphereMD5
 from lib.dspbptk.Tools import DateTimeTools
 
 from BinaryWriter import BinaryWriter
+from DSPBlueprintValidator import DSPBlueprintValidator
 from DysonFrame import DysonFrame
 from DysonNode import DysonNode
 from DysonShell import DysonShell
@@ -25,6 +26,11 @@ polyhedron.tessellate_edges(3)
 #     polyhedron = Polyhedron.create_from_polyhedronisme_obj_file(file_content)
 
 #polyhedron.plot_polyhedron()
+
+print(DSPBlueprintValidator.validate_polyhedron(polyhedron))
+if not DSPBlueprintValidator.validate_polyhedron(polyhedron):
+    print("The polyhedron cannot be created within the game.")
+    exit(1)
 
 nodes = []
 frames = []
