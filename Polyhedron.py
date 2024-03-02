@@ -99,6 +99,20 @@ class Polyhedron:
         return cls(vertices, faces)
 
     @staticmethod
+    def compute_latitude(vertex, radius=1):
+        x, y, z = vertex
+        length = math.sqrt(x**2 + y**2 + z**2)
+        x_proj, y_proj, z_proj = radius * x / length, radius * y / length, radius * z / length
+
+        latitude = math.degrees(math.asin(z_proj / radius))
+        return latitude
+
+    def absolute_latitude(self):
+        latitudes = [math.ceil(abs(self.compute_latitude(vertex))) for vertex in self._vertices]
+        max_latitude = min(max(latitudes), 90)
+        return max_latitude
+
+    @staticmethod
     def centroid(points):
         num_points = len(points)
         x_sum, y_sum, z_sum = 0, 0, 0
