@@ -1,17 +1,19 @@
-import struct
+import base64
 import datetime
 import gzip
-import base64
-import urllib.parse
+import io
+import struct
+
 from lib.dspbptk.MD5 import DysonSphereMD5
 from lib.dspbptk.Tools import DateTimeTools
-import io
+
 from BinaryWriter import BinaryWriter
 from DysonFrame import DysonFrame
 from DysonNode import DysonNode
 from DysonShell import DysonShell
 from DysonSphereLayer import DysonSphereLayer
 from Polyhedron import Polyhedron
+
 
 polyhedron = Polyhedron.create_icosahedron()
 polyhedron.coxeter_operator()

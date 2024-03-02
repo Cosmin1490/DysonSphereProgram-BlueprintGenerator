@@ -22,7 +22,7 @@ class DysonShell:
     @classmethod
     def create_with_defaults(cls, shellId: int, nodes: List[int]):
         default_protoId = 0
-        default_randSeed = random.randint(0, 2**16 - 1)
+        default_randSeed = random.randint(0, 2**31 - 1)
         default_color = (0, 0, 0, 0)
 
         return cls(shellId, default_protoId, default_randSeed, default_color, nodes)
