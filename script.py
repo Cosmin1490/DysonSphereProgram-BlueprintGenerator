@@ -27,7 +27,6 @@ polyhedron.tessellate_edges(3)
 
 #polyhedron.plot_polyhedron()
 
-print(DSPBlueprintValidator.validate_polyhedron(polyhedron))
 if not DSPBlueprintValidator.validate_polyhedron(polyhedron):
     print("The polyhedron cannot be created within the game.")
     exit(1)
@@ -48,7 +47,6 @@ for index, face in enumerate(polyhedron.faces):
     shells.append(DysonShell.create_with_defaults(index + 1, incremented_face))
 
 memory_stream = io.BytesIO()
-
 with memory_stream as f:
     node = DysonSphereLayer.create_with_defaults(nodes, frames, shells)
     writer = BinaryWriter(f)
