@@ -26,7 +26,7 @@ polyhedron.tessellate_edges_by_dist(0.10)
 #     file_content = file.read()
 #     polyhedron = Polyhedron.create_from_polyhedronisme_obj_file(file_content)
 
-polyhedron.plot_polyhedron()
+#polyhedron.plot_polyhedron()
 
 if not DSPBlueprintValidator.validate_polyhedron(polyhedron):
     print("The polyhedron cannot be created within the game.")
