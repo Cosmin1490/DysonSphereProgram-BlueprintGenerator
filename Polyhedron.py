@@ -300,7 +300,7 @@ class Polyhedron:
                 if edge not in edge_new_vertices:
                     new_vertex_indices = []
                     edge_length = np.linalg.norm(np.array(v2) - np.array(v1))
-                    min_distance_on_sphere = 0.05
+                    min_distance_on_sphere = 0.0442
                     angle_min_distance = np.arccos(1 - min_distance_on_sphere**2 / 2)
 
                     v1_normalized = np.array(v1) / np.linalg.norm(v1)
