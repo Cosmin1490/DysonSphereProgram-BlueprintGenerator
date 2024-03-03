@@ -338,7 +338,7 @@ class Polyhedron:
             updated_face = [index - (last_faceless_index + 1) for index in face]
             self._faces[i] = updated_face
 
-    def truncate_vertices(self, min_dist = 0.0442):
+    def truncate_vertices(self, num_nodes=1):
         # Initialize new vertices and faces lists
         new_vertices = []
         new_faces = []
@@ -360,21 +360,10 @@ class Polyhedron:
                 # Calculate new vertex positions if not already done
                 if edge not in edge_new_vertices:
                     new_vertex_indices = []
-                    edge_length = np.linalg.norm(np.array(v2) - np.array(v1))
-                    angle_min_distance = np.arccos(1 - min_dist**2 / 2)
-
-                    v1_normalized = np.array(v1) / np.linalg.norm(v1)
-                    v2_normalized = np.array(v2) / np.linalg.norm(v2)
-                    angle_v1_v2 = np.arccos(np.dot(v1_normalized, v2_normalized))
-
-                    ratio1 = angle_min_distance / angle_v1_v2
-                    ratio2 = 1 - ratio1
-
-                    for j, ratio in enumerate([ratio1, ratio2]):
-                        new_vertex = np.array(v1) + (np.array(v2) - np.array(v1)) * ratio
-                        new_vertex_normalized = new_vertex / np.linalg.norm(new_vertex)
+                    for j in range(1, num_nodes + 1):
+                        new_vertex = np.array(v1) + (np.array(v2) - np.array(v1)) * j / (num_nodes + 1)
                         new_vertex_index = len(new_vertices) + len(self._vertices)
-                        new_vertices.append(new_vertex_normalized)
+                        new_vertices.append(new_vertex)
                         new_vertex_indices.append(new_vertex_index)
 
                     # Store the new vertex indices in the dictionary
@@ -393,13 +382,12 @@ class Polyhedron:
             # Add the new face to the new faces list
             new_faces.append(new_face)
 
+
         # Update the polyhedron with the new vertices and faces
         old_size = len(self._vertices)
         self._vertices.extend(new_vertices)
         self._faces = new_faces
         self.delete_faceless_vertices(old_size - 1)
-
-
 
     @staticmethod
     def project_to_sphere(vertices, radius=1):
