@@ -20,6 +20,7 @@ polyhedron = Polyhedron.create_icosahedron()
 polyhedron.coxeter_operator()
 polyhedron.dual_operator()
 polyhedron.tessellate_edges(3)
+#polyhedron.truncate_vertices(1)
 
 # with open("./polyhedronisme/polyhedronisme-A10wD.obj", "r") as file:
 #     file_content = file.read()
