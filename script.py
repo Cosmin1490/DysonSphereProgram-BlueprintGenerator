@@ -19,14 +19,14 @@ from Polyhedron import Polyhedron
 polyhedron = Polyhedron.create_icosahedron()
 polyhedron.coxeter_operator()
 polyhedron.dual_operator()
-polyhedron.tessellate_edges(3)
-#polyhedron.truncate_vertices(1)
+polyhedron.truncate_vertices()
+polyhedron.tessellate_edges_by_dist(0.10)
 
 # with open("./polyhedronisme/polyhedronisme-A10wD.obj", "r") as file:
 #     file_content = file.read()
 #     polyhedron = Polyhedron.create_from_polyhedronisme_obj_file(file_content)
 
-#polyhedron.plot_polyhedron()
+polyhedron.plot_polyhedron()
 
 if not DSPBlueprintValidator.validate_polyhedron(polyhedron):
     print("The polyhedron cannot be created within the game.")

@@ -268,6 +268,67 @@ class Polyhedron:
         self._vertices = new_vertices
         self._faces = new_faces
 
+    def tessellate_edges_by_dist(self, min_dist=0.10):
+        # Initialize new vertices and faces lists
+        new_vertices = self._vertices.copy()
+        new_faces = []
+
+        # Create a dictionary to store new vertices indices for each edge
+        edge_new_vertices = {}
+
+        # Iterate over faces
+        for face in self._faces:
+            new_face = []
+            for i in range(len(face)):
+                # Get the two vertices forming the current edge
+                v1 = self._vertices[face[i]]
+                v2 = self._vertices[face[(i + 1) % len(face)]]
+
+                # Get the sorted edge tuple
+                edge = tuple(sorted((face[i], face[(i + 1) % len(face)])))
+
+                # Calculate new vertex positions if not already done
+                if edge not in edge_new_vertices:
+                    new_vertex_indices = []
+
+                    v1_normalized = np.array(v1) / np.linalg.norm(v1)
+                    v2_normalized = np.array(v2) / np.linalg.norm(v2)
+
+                    angle_v1_v2 = np.arccos(np.dot(v1_normalized, v2_normalized))
+                    angle_min_distance = np.arccos(1 - min_dist**2 / 2)
+
+                    num_segments = int(np.ceil(angle_v1_v2 / angle_min_distance))
+
+                    for j in range(1, num_segments):
+                        ratio = j / num_segments
+                        new_vertex = np.array(v1) + (np.array(v2) - np.array(v1)) * ratio
+                        new_vertex_normalized = new_vertex / np.linalg.norm(new_vertex)
+                        new_vertex_index = len(new_vertices)
+                        new_vertices.append(new_vertex_normalized)
+                        new_vertex_indices.append(new_vertex_index)
+
+                    # Store the new vertex indices in the dictionary
+                    edge_new_vertices[edge] = tuple(new_vertex_indices)
+
+                # Get new vertex indices from the dictionary
+                new_vertex_indices = edge_new_vertices[edge]
+
+                # Add new vertex indices to the new face
+                new_face.append(face[i])
+
+                if(len(new_vertex_indices) > 0):
+                    # Check if the first new vertex is closer to v1 or v2
+                    if np.linalg.norm(new_vertices[new_vertex_indices[0]] - v1) < np.linalg.norm(new_vertices[new_vertex_indices[0]] - v2):
+                        new_face.extend(new_vertex_indices)
+                    else:
+                        new_face.extend(reversed(new_vertex_indices))
+            # Replace the original face with the new face
+            new_faces.append(new_face)
+
+        # Update the polyhedron with the new vertices and faces
+        self._vertices = new_vertices
+        self._faces = new_faces
+
     def delete_faceless_vertices(self, last_faceless_index):
         # Remove the faceless vertices from the vertices list
         self._vertices = self._vertices[last_faceless_index + 1:]
@@ -277,7 +338,7 @@ class Polyhedron:
             updated_face = [index - (last_faceless_index + 1) for index in face]
             self._faces[i] = updated_face
 
-    def truncate_vertices(self, num_nodes=1):
+    def truncate_vertices(self, min_dist = 0.0442):
         # Initialize new vertices and faces lists
         new_vertices = []
         new_faces = []
@@ -299,10 +360,21 @@ class Polyhedron:
                 # Calculate new vertex positions if not already done
                 if edge not in edge_new_vertices:
                     new_vertex_indices = []
-                    for j in range(1, num_nodes + 1):
-                        new_vertex = np.array(v1) + (np.array(v2) - np.array(v1)) * j / (num_nodes + 1)
+                    edge_length = np.linalg.norm(np.array(v2) - np.array(v1))
+                    angle_min_distance = np.arccos(1 - min_dist**2 / 2)
+
+                    v1_normalized = np.array(v1) / np.linalg.norm(v1)
+                    v2_normalized = np.array(v2) / np.linalg.norm(v2)
+                    angle_v1_v2 = np.arccos(np.dot(v1_normalized, v2_normalized))
+
+                    ratio1 = angle_min_distance / angle_v1_v2
+                    ratio2 = 1 - ratio1
+
+                    for j, ratio in enumerate([ratio1, ratio2]):
+                        new_vertex = np.array(v1) + (np.array(v2) - np.array(v1)) * ratio
+                        new_vertex_normalized = new_vertex / np.linalg.norm(new_vertex)
                         new_vertex_index = len(new_vertices) + len(self._vertices)
-                        new_vertices.append(new_vertex)
+                        new_vertices.append(new_vertex_normalized)
                         new_vertex_indices.append(new_vertex_index)
 
                     # Store the new vertex indices in the dictionary
@@ -321,12 +393,13 @@ class Polyhedron:
             # Add the new face to the new faces list
             new_faces.append(new_face)
 
-
         # Update the polyhedron with the new vertices and faces
         old_size = len(self._vertices)
         self._vertices.extend(new_vertices)
         self._faces = new_faces
         self.delete_faceless_vertices(old_size - 1)
+
+
 
     @staticmethod
     def project_to_sphere(vertices, radius=1):
