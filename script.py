@@ -19,12 +19,14 @@ from Polyhedron import Polyhedron
 polyhedron = Polyhedron.create_icosahedron()
 polyhedron.coxeter_operator()
 polyhedron.dual_operator()
-polyhedron.truncate_vertices()
-polyhedron.tessellate_edges_by_dist(0.10)
+polyhedron.kis_operator()
+polyhedron.dual_operator()
+polyhedron.tessellate_edges(1)
 
-# with open("./polyhedronisme/polyhedronisme-A10wD.obj", "r") as file:
-#     file_content = file.read()
-#     polyhedron = Polyhedron.create_from_polyhedronisme_obj_file(file_content)
+#with open("./polyhedronisme/polyhedronisme-A10wD.obj", "r") as file:
+#    file_content = file.read()
+#    polyhedron = Polyhedron.create_from_polyhedronisme_obj_file(file_content)
+#polyhedron.tessellate_edges_by_dist(0.10)
 
 #polyhedron.plot_polyhedron()
 
