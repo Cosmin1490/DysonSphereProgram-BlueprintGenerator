@@ -7,7 +7,7 @@ from Polyhedron import Polyhedron
 class DSPBlueprintValidator:
 
     @staticmethod
-    def validate_vertices(polyhedron, min_distance=0.0715, tolerance=1e-9):
+    def validate_vertices(polyhedron, min_distance=0.07155, tolerance=1e-9):
         vertices = Polyhedron.project_to_sphere(polyhedron.vertices, 1)
         tree = KDTree(vertices)
         for i in range(len(vertices)):
@@ -19,7 +19,7 @@ class DSPBlueprintValidator:
         return True
 
     @staticmethod
-    def validate_polyhedron(polyhedron, min_distance=0.0715, tolerance=1e-9):
+    def validate_polyhedron(polyhedron, min_distance=0.07155, tolerance=1e-9):
         return DSPBlueprintValidator.validate_vertices(polyhedron, min_distance, tolerance)
 
 
