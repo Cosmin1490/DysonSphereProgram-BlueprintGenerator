@@ -82,6 +82,69 @@ class Polyhedron:
         icosahedron_faces = cls.icosahedron_faces()
         return cls(icosahedron_verts, icosahedron_faces)
 
+    @staticmethod
+    def tetrahedron_vertices():
+        vertices = [
+            (1, 1, 1),
+            (1, -1, -1),
+            (-1, 1, -1),
+            (-1, -1, 1)
+        ]
+        return vertices
+
+    @staticmethod
+    def tetrahedron_faces():
+        faces = [
+            (0, 1, 2),
+            (0, 1, 3),
+            (0, 2, 3),
+            (1, 2, 3)
+        ]
+        return faces
+
+    @classmethod
+    def create_tetrahedron(cls):
+        tetrahedron_verts = cls.tetrahedron_vertices()
+        tetrahedron_faces = cls.tetrahedron_faces()
+        return cls(tetrahedron_verts, tetrahedron_faces)
+
+    def cube_vertices():
+        vertices = [
+            (1, 1, 1),
+            (1, 1, -1),
+            (1, -1, 1),
+            (1, -1, -1),
+            (-1, 1, 1),
+            (-1, 1, -1),
+            (-1, -1, 1),
+            (-1, -1, -1)
+        ]
+        return vertices
+
+    @staticmethod
+    def cube_faces():
+        faces = [
+            (0, 1, 3, 2),
+            (0, 4, 5, 1),
+            (4, 6, 7, 5),
+            (2, 3, 7, 6),
+            (0, 2, 6, 4),
+            (1, 5, 7, 3)
+        ]
+        return faces
+
+    @classmethod
+    def create_cube(cls):
+        cube_verts = cls.cube_vertices()
+        cube_faces = cls.cube_faces()
+        return cls(cube_verts, cube_faces)
+
+    @classmethod
+    def create_cube(cls):
+        cube_verts = cls.cube_vertices()
+        cube_faces = cls.cube_faces()
+        return cls(cube_verts, cube_faces)
+
     @classmethod
     def create_from_polyhedronisme_obj_file(cls, file_content):
         lines = file_content.split("\n")
