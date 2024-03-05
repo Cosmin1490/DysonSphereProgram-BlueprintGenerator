@@ -146,6 +146,43 @@ class Polyhedron:
         return cls(cube_verts, cube_faces)
 
     @classmethod
+    def create_prism(cls, n, height):
+        angle = 2 * math.pi / n
+        vertices = []
+
+        # Add bottom vertices
+        for i in range(n):
+            x = math.cos(i * angle)
+            y = math.sin(i * angle)
+            z = -height / 2
+            vertices.append((x, y, z))
+
+        # Add top vertices
+        for i in range(n):
+            x = math.cos(i * angle)
+            y = math.sin(i * angle)
+            z = height / 2
+            vertices.append((x, y, z))
+
+        # Create faces
+        faces = []
+
+        # Add bottom face
+        bottom_face = tuple(range(n))
+        faces.append(bottom_face)
+
+        # Add top face
+        top_face = tuple(range(n, 2 * n))
+        faces.append(top_face)
+
+        # Add lateral faces
+        for i in range(n):
+            face = (i, (i + 1) % n, (i + 1) % n + n, i + n)
+            faces.append(face)
+
+        return cls(vertices, faces)
+
+    @classmethod
     def create_from_polyhedronisme_obj_file(cls, file_content):
         lines = file_content.split("\n")
         vertices = []
