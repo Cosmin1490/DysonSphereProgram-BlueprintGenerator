@@ -28,6 +28,8 @@ polyhedron.truncate_vertices(3)
 #polyhedron.tessellate_edges_by_dist(0.10)
 
 #polyhedron.plot_polyhedron()
+#polyhedron = DSPBlueprintValidator.correct_polyhedron(polyhedron)
+#polyhedron.plot_polyhedron()
 
 if not DSPBlueprintValidator.validate_polyhedron(polyhedron):
     print("The polyhedron cannot be created within the game.")

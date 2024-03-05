@@ -392,6 +392,18 @@ class Polyhedron:
         self._vertices = new_vertices
         self._faces = new_faces
 
+    def delete_vertex(self, vertex_index):
+        # Remove the vertex from the vertices list
+        self._vertices.pop(vertex_index)
+
+        # Update the indices of the faces and remove faces that contain the deleted vertex
+        updated_faces = []
+        for face in self._faces:
+            updated_face = [index - 1 if index > vertex_index else index for index in face]
+            if vertex_index not in face:
+                updated_faces.append(updated_face)
+        self._faces = updated_faces
+
     def delete_faceless_vertices(self, last_faceless_index):
         # Remove the faceless vertices from the vertices list
         self._vertices = self._vertices[last_faceless_index + 1:]
