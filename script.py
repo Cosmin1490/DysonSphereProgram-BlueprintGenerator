@@ -29,7 +29,7 @@ from Polyhedron import Polyhedron
 #polyhedron.tessellate_edges_by_dist(0.10)
 
 
-points  = np.random.rand(80, 3)
+points  = np.random.rand(42, 3)
 from Optimizer import Optimizer
 optimizer = Optimizer(points, num_epochs=20000)
 optimizer.optimize()
