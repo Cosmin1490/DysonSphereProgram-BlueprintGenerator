@@ -24,12 +24,15 @@ class Optimizer:
         return L_tf
 
     def optimize(self):
-        for epoch in range(self.num_epochs):
-            with tf.GradientTape() as tape:
-                loss = self.compute_loss()
-            gradients = tape.gradient(loss, [self.x])
-            self.optimizer.apply_gradients(zip(gradients, [self.x]))
-            print(f'Epoch {epoch + 1}, Loss: {loss.numpy()}')
+        try:
+            for epoch in range(self.num_epochs):
+                with tf.GradientTape() as tape:
+                    loss = self.compute_loss()
+                gradients = tape.gradient(loss, [self.x])
+                self.optimizer.apply_gradients(zip(gradients, [self.x]))
+                print(f'Epoch {epoch + 1}, Loss: {loss.numpy()}')
+        except KeyboardInterrupt:
+            print("Optimization stopped by user.")
 
     def get_updated_points(self):
         return self.x.numpy()
