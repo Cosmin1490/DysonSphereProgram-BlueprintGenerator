@@ -2,10 +2,12 @@ import base64
 import datetime
 import gzip
 import io
+import numpy as np
 import struct
 
 from lib.dspbptk.MD5 import DysonSphereMD5
 from lib.dspbptk.Tools import DateTimeTools
+from scipy.spatial import ConvexHull, Delaunay
 
 from BinaryWriter import BinaryWriter
 from DSPBlueprintValidator import DSPBlueprintValidator
@@ -13,23 +15,50 @@ from DysonFrame import DysonFrame
 from DysonNode import DysonNode
 from DysonShell import DysonShell
 from DysonSphereLayer import DysonSphereLayer
+from Optimizer import Optimizer
 from Polyhedron import Polyhedron
 
 
-polyhedron = Polyhedron.create_icosahedron()
-polyhedron.coxeter_operator()
-polyhedron.dual_operator()
-polyhedron.truncate_vertices(3)
-#polyhedron.tessellate_edges(3)
+#polyhedron = Polyhedron.create_icosahedron()
+#polyhedron.coxeter_operator()
+#polyhedron.dual_operator()
 
 #with open("./polyhedronisme/polyhedronisme-A10wD.obj", "r") as file:
 #    file_content = file.read()
 #    polyhedron = Polyhedron.create_from_polyhedronisme_obj_file(file_content)
 #polyhedron.tessellate_edges_by_dist(0.10)
 
-#polyhedron.plot_polyhedron()
-#polyhedron = DSPBlueprintValidator.correct_polyhedron(polyhedron)
-#polyhedron.plot_polyhedron()
+
+points  = np.random.rand(80, 3)
+from Optimizer import Optimizer
+optimizer = Optimizer(points, num_epochs=20000)
+optimizer.optimize()
+points = optimizer.get_updated_points()
+points = [point.tolist() for point in points]
+
+delaunay = Delaunay(points)
+
+# Get the faces by creating the convex hull of the Delaunay triangulation
+hull = ConvexHull(delaunay.points)
+
+# Deduplicate faces using a dictionary
+face_dict = {}
+for face in hull.simplices:
+    sorted_face_tuple = tuple(sorted(face))
+    if sorted_face_tuple not in face_dict:
+        face_dict[sorted_face_tuple] = face
+
+unique_faces = list(face_dict.values())
+unique_faces = [face.tolist() for face in unique_faces]
+
+
+# Create the Polyhedron using the original vertices and unique_faces
+polyhedron = Polyhedron(points, unique_faces)
+polyhedron.dual_operator()
+
+polyhedron.plot_polyhedron()
+polyhedron = DSPBlueprintValidator.correct_polyhedron(polyhedron)
+polyhedron.plot_polyhedron()
 
 if not DSPBlueprintValidator.validate_polyhedron(polyhedron):
     print("The polyhedron cannot be created within the game.")
