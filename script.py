@@ -18,18 +18,7 @@ from DysonSphereLayer import DysonSphereLayer
 from Optimizer import Optimizer
 from Polyhedron import Polyhedron
 
-
-#polyhedron = Polyhedron.create_icosahedron()
-#polyhedron.coxeter_operator()
-#polyhedron.dual_operator()
-
-#with open("./polyhedronisme/polyhedronisme-A10wD.obj", "r") as file:
-#    file_content = file.read()
-#    polyhedron = Polyhedron.create_from_polyhedronisme_obj_file(file_content)
-#polyhedron.tessellate_edges_by_dist(0.10)
-
-
-points  = np.random.rand(303, 3)
+points  = np.random.rand(42, 3)
 from Optimizer import Optimizer
 optimizer = Optimizer(points, num_epochs=30000)
 optimizer.optimize()
@@ -56,9 +45,9 @@ unique_faces = [face.tolist() for face in unique_faces]
 polyhedron = Polyhedron(points, unique_faces)
 polyhedron.dual_operator()
 
-polyhedron.plot_polyhedron()
+#polyhedron.plot_polyhedron()
 polyhedron = DSPBlueprintValidator.correct_polyhedron(polyhedron)
-polyhedron.plot_polyhedron()
+#polyhedron.plot_polyhedron()
 
 if not DSPBlueprintValidator.validate_polyhedron(polyhedron):
     print("The polyhedron cannot be created within the game.")
