@@ -20,7 +20,7 @@ class DSPBlueprintValidator:
 
     @staticmethod
     def validate_polyhedron(polyhedron, min_distance=0.00511225):
-        return DSPBlueprintValidator.validate_vertices(polyhedron, min_distance, tolerance)
+        return DSPBlueprintValidator.validate_vertices(polyhedron, min_distance)
 
     @staticmethod
     def correct_polyhedron(polyhedron, min_distance=0.00511225):
