@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 
 class SphereOptimizer:
-    def __init__(self, points, learning_rate=0.0001, num_epochs=1000):
+    def __init__(self, points, learning_rate=0.00001, num_epochs=1000):
         self.n_points = len(points)
         self.points = tf.Variable(points, dtype=tf.float32)
         self.points.assign(tf.nn.l2_normalize(self.points, axis=-1))
