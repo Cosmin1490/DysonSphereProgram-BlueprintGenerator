@@ -18,11 +18,21 @@ from DysonSphereLayer import DysonSphereLayer
 from Optimizer import Optimizer
 from Polyhedron import Polyhedron
 
-points  = np.random.rand(42, 3)
-from Optimizer import Optimizer
-optimizer = Optimizer(points, num_epochs=30000)
+#points  = np.random.rand(42, 3)
+#from Optimizer import Optimizer
+#optimizer = Optimizer(points, num_epochs=30000)
+#optimizer.optimize()
+#points = optimizer.get_updated_points()
+
+#points  = np.random.rand(42, 3)
+points  = np.random.rand(2647, 3)
+
+#polyhedron.plot_polyhedron()
+from SphereOptimizerV2 import SphereOptimizer
+optimizer = Optimizer(points, num_epochs=250000)
 optimizer.optimize()
 points = optimizer.get_updated_points()
+
 points = [point.tolist() for point in points]
 
 delaunay = Delaunay(points)
@@ -43,11 +53,12 @@ unique_faces = [face.tolist() for face in unique_faces]
 
 # Create the Polyhedron using the original vertices and unique_faces
 polyhedron = Polyhedron(points, unique_faces)
+#polyhedron = Polyhedron(points, [])
 polyhedron.dual_operator()
 
-#polyhedron.plot_polyhedron()
+polyhedron.plot_polyhedron()
 polyhedron = DSPBlueprintValidator.correct_polyhedron(polyhedron)
-#polyhedron.plot_polyhedron()
+polyhedron.plot_polyhedron()
 
 if not DSPBlueprintValidator.validate_polyhedron(polyhedron):
     print("The polyhedron cannot be created within the game.")
