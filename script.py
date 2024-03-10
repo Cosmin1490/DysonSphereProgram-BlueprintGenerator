@@ -23,12 +23,17 @@ from Polyhedron import Polyhedron
 #optimizer.optimize()
 #points = optimizer.get_updated_points()
 
-points  = np.random.rand(42, 3)
+points  = np.random.rand(642, 3)
 #points  = np.random.rand(2647, 3)
 
-#polyhedron.plot_polyhedron()
+from Optimizer import Optimizer
+optimizer = Optimizer(points, num_epochs=2500000)
+optimizer.optimize()
+points = optimizer.get_updated_points()
+
+Polyhedron([point.tolist() for point in points], []).plot_polyhedron()
 from SphereOptimizerV2 import SphereOptimizer
-optimizer = SphereOptimizer(points, num_epochs=250000)
+optimizer = SphereOptimizer(points, num_epochs=25000000)
 optimizer.optimize()
 points = optimizer.get_updated_points()
 
