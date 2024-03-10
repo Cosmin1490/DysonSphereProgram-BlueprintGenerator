@@ -501,6 +501,35 @@ class Polyhedron:
         self._faces = new_faces
         self.delete_faceless_vertices(old_size - 1)
 
+    def split_hexagons(self):
+        new_faces = []
+        for face in self._faces:
+            # Check if the face has 6 vertices (is a hexagon)
+            if len(face) == 6:
+                hexagon_neighbor_count = [0] * 6
+                for other_face in self._faces:
+                    if other_face != face and len(other_face) == 6:
+                        for i, vertex in enumerate(face):
+                            if vertex in other_face:
+                                hexagon_neighbor_count[i] += 1
+
+                # Find the first point shared by only other hexagonal faces
+                for i, count in enumerate(hexagon_neighbor_count):
+                    if count == 2:
+                        point1 = i
+                        break
+
+                # The opposing point is 3 positions away
+                point2 = (point1 + 3) % 6
+
+                # Split the hexagon into two separate faces
+                new_faces.append(face[:point1+1] + [face[point2]] + face[point2+1:])
+                new_faces.append([face[point1]] + face[point1+1:point2+1])
+            else:
+                new_faces.append(face)
+
+        self._faces = new_faces
+
     @staticmethod
     def project_to_sphere(vertices, radius=1):
         projected_vertices = []
