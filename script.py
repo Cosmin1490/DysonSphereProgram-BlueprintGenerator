@@ -24,9 +24,11 @@ from Polyhedron import Polyhedron
 #points = optimizer.get_updated_points()
 
 #points  = np.random.rand(642, 3)
-points  = np.random.rand(2647, 3)
+#points  = np.random.rand(2647, 3)
+points  = np.random.rand(2648, 3)
 
-from Optimizer import Optimizer
+#from Optimizer import Optimizer
+from OptimizerAntipodal import Optimizer
 optimizer = Optimizer(points, num_epochs=50000)
 optimizer.optimize()
 points = optimizer.get_updated_points()
