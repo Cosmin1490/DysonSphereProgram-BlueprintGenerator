@@ -18,6 +18,7 @@ class Optimizer:
     def compute_full_points(self):
         return tf.concat([self.x, self.compute_antipodal_points()], axis=0)
 
+    @tf.function
     def compute_loss(self):
         full_points = self.compute_full_points()
         epsilon = 1e-7
@@ -54,10 +55,10 @@ class Optimizer:
         return np.concatenate([self.best_x, -1 * self.best_x], axis=0)
 
 # Example usage:
-points = [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [-0.1, -0.2, -0.3], [-0.4, -0.5, -0.6]]
-
-optimizer = Optimizer(points)
-optimizer.optimize()
-new_points = optimizer.get_updated_points()
-print("Best values of x:")
-print(new_points)
+#points = [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [-0.1, -0.2, -0.3], [-0.4, -0.5, -0.6]]
+#
+#optimizer = Optimizer(points)
+#optimizer.optimize()
+#new_points = optimizer.get_updated_points()
+#print("Best values of x:")
+#print(new_points)
