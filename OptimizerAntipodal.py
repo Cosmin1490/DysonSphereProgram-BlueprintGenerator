@@ -9,7 +9,7 @@ class Optimizer:
         self.x = tf.Variable(points[:self.n//2], dtype=tf.float64)
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
         self.num_epochs = num_epochs
-        self.best_x = None
+        self.best_x = tf.Variable(self.x.value(), dtype=tf.float64)
         self.best_loss = float('inf')
 
     def compute_antipodal_points(self):
@@ -34,17 +34,22 @@ class Optimizer:
         L_tf = (tf.reduce_sum(tf_rec_pq_dist) / 2 + self.k * tf.reduce_sum(tf_surface_dist_sq)) / self.n
         return L_tf
 
+    @tf.function
+    def optimize_step(self):
+        with tf.GradientTape() as tape:
+            loss = self.compute_loss()
+        gradients = tape.gradient(loss, [self.x])
+        self.optimizer.apply_gradients(zip(gradients, [self.x]))
+        return loss
+
     def optimize(self):
         try:
             for epoch in range(self.num_epochs):
-                with tf.GradientTape() as tape:
-                    loss = self.compute_loss()
-                gradients = tape.gradient(loss, [self.x])
-                self.optimizer.apply_gradients(zip(gradients, [self.x]))
+                loss = self.optimize_step()
 
                 # Update best_x and best_loss if a better configuration is found
                 if loss.numpy() < self.best_loss:
-                    self.best_x = self.x.numpy()
+                    self.best_x.assign(self.x.value())
                     self.best_loss = loss.numpy()
 
                 print(f'Epoch {epoch + 1}, Loss: {loss.numpy()}')
@@ -52,13 +57,4 @@ class Optimizer:
             print("Optimization stopped by user.")
 
     def get_updated_points(self):
-        return np.concatenate([self.best_x, -1 * self.best_x], axis=0)
-
-# Example usage:
-#points = [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [-0.1, -0.2, -0.3], [-0.4, -0.5, -0.6]]
-#
-#optimizer = Optimizer(points)
-#optimizer.optimize()
-#new_points = optimizer.get_updated_points()
-#print("Best values of x:")
-#print(new_points)
+        return np.concatenate([self.best_x.numpy(), -1 * self.best_x.numpy()], axis=0)
