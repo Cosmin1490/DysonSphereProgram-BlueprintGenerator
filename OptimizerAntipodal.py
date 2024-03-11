@@ -9,6 +9,8 @@ class Optimizer:
         self.x = tf.Variable(points[:self.n//2], dtype=tf.float64)
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
         self.num_epochs = num_epochs
+        self.best_x = None
+        self.best_loss = float('inf')
 
     def compute_antipodal_points(self):
         return -1 * self.x
@@ -38,18 +40,24 @@ class Optimizer:
                     loss = self.compute_loss()
                 gradients = tape.gradient(loss, [self.x])
                 self.optimizer.apply_gradients(zip(gradients, [self.x]))
+
+                # Update best_x and best_loss if a better configuration is found
+                if loss.numpy() < self.best_loss:
+                    self.best_x = self.x.numpy()
+                    self.best_loss = loss.numpy()
+
                 print(f'Epoch {epoch + 1}, Loss: {loss.numpy()}')
         except KeyboardInterrupt:
             print("Optimization stopped by user.")
 
     def get_updated_points(self):
-        return self.compute_full_points().numpy()
+        return np.concatenate([self.best_x, -1 * self.best_x], axis=0)
 
 # Example usage:
-#points = [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [-0.1, -0.2, -0.3], [-0.4, -0.5, -0.6]]
-#
-#optimizer = Optimizer(points)
-#optimizer.optimize()
-#new_points = optimizer.get_updated_points()
-#print("Final values of x:")
-#print(new_points)
+points = [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [-0.1, -0.2, -0.3], [-0.4, -0.5, -0.6]]
+
+optimizer = Optimizer(points)
+optimizer.optimize()
+new_points = optimizer.get_updated_points()
+print("Best values of x:")
+print(new_points)
