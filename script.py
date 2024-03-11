@@ -32,7 +32,7 @@ optimizer.optimize()
 points = optimizer.get_updated_points()
 
 Polyhedron([point.tolist() for point in points], []).plot_polyhedron()
-from SphereOptimizerV import SphereOptimizer
+from SphereOptimizer import SphereOptimizer
 optimizer = SphereOptimizer(points, num_epochs=5000000)
 optimizer.optimize()
 points = optimizer.get_updated_points()
