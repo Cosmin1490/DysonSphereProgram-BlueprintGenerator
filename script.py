@@ -29,13 +29,13 @@ points  = np.random.rand(2648, 3)
 
 #from Optimizer import Optimizer
 from OptimizerAntipodal import Optimizer
-optimizer = Optimizer(points, num_epochs=50000)
+optimizer = Optimizer(points, num_epochs=30000)
 optimizer.optimize()
 points = optimizer.get_updated_points()
 
 Polyhedron([point.tolist() for point in points], []).plot_polyhedron()
 from SphereOptimizerAntipodal import SphereOptimizer
-optimizer = SphereOptimizer(points, num_epochs=5000000)
+optimizer = SphereOptimizer(points, num_epochs=10000000)
 optimizer.optimize()
 points = optimizer.get_updated_points()
 
