@@ -23,10 +23,15 @@ import optimizers as opt
 #points  = np.random.rand(642, 3)
 #points  = np.random.rand(2647, 3)
 points  = np.random.rand(2648, 3)
+#with open('./saves/stage1.txt', 'r') as f:
+#    points = np.loadtxt(f)
+#
+#optimizer = opt.EnergyOptimizerAntipodal(points, num_epochs=30000)
+#optimizer.optimize()
+#points = optimizer.get_updated_points()
 
-optimizer = opt.EnergyOptimizerAntipodal(points, num_epochs=30000)
-optimizer.optimize()
-points = optimizer.get_updated_points()
+with open('./saves/stage2.txt', 'r') as f:
+    points = np.loadtxt(f)
 
 Polyhedron([point.tolist() for point in points], []).plot_polyhedron()
 
