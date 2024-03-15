@@ -55,7 +55,7 @@ class EnergyOptimizerAntipodal(BaseOptimizer):
                     self.best_loss = loss.numpy()
                 if (epoch + 1) % 10000 == 0:
                     updated_points = self.get_updated_points()
-                    with open('stage1.txt', 'w') as f:
+                    with open('./saves/stage1.txt', 'w') as f:
                         np.savetxt(f, updated_points)
 
                 print(f'Epoch {epoch + 1}, Loss: {loss.numpy()}')
