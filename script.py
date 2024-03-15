@@ -17,25 +17,20 @@ from DysonShell import DysonShell
 from DysonSphereLayer import DysonSphereLayer
 from Polyhedron import Polyhedron
 
-#points  = np.random.rand(42, 3)
-#from Optimizer import Optimizer
-#optimizer = Optimizer(points, num_epochs=30000)
-#optimizer.optimize()
-#points = optimizer.get_updated_points()
+import optimizers as opt
+
 
 #points  = np.random.rand(642, 3)
 #points  = np.random.rand(2647, 3)
 points  = np.random.rand(2648, 3)
 
-#from Optimizer import Optimizer
-from OptimizerAntipodal import Optimizer
-optimizer = Optimizer(points, num_epochs=30000)
+optimizer = opt.EnergyOptimizerAntipodal(points, num_epochs=30000)
 optimizer.optimize()
 points = optimizer.get_updated_points()
 
 Polyhedron([point.tolist() for point in points], []).plot_polyhedron()
-from SphereOptimizerAntipodal import SphereOptimizer
-optimizer = SphereOptimizer(points, num_epochs=10000000)
+
+optimizer = opt.EuclidianDistanceAntipodalOptimizer(points, num_epochs=10000000)
 optimizer.optimize()
 points = optimizer.get_updated_points()
 

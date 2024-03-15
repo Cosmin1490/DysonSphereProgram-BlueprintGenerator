@@ -1,8 +1,10 @@
 import tensorflow as tf
 import numpy as np
+from .BaseOptimizer import BaseOptimizer
 
-class Optimizer:
+class EnergyOptimizer(BaseOptimizer):
     def __init__(self, points, k=10000, learning_rate=0.0001, num_epochs=10000):
+        super().__init__()
         self.n = len(points)
         self.k = k
         self.x = tf.Variable(points, dtype=tf.float64)
@@ -36,12 +38,3 @@ class Optimizer:
 
     def get_updated_points(self):
         return self.x.numpy()
-
-# Example usage:
-#points = [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]]
-#
-#optimizer = Optimizer(points)
-#optimizer.optimize()
-#new_points = optimizer.get_updated_points()
-#print("Final values of x:")
-#print(new_points)

@@ -1,8 +1,10 @@
 import tensorflow as tf
 import numpy as np
+from .BaseOptimizer import BaseOptimizer
 
-class SphereOptimizer:
+class EuclidianDistanceAntipodalOptimizer(BaseOptimizer):
     def __init__(self, points, learning_rate=0.00001, num_epochs=1000):
+        super().__init__()
         self.n_points = len(points)
         assert self.n_points % 2 == 0, "Number of points must be even."
         self.points = tf.Variable(points[:self.n_points//2], dtype=tf.float32)

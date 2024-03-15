@@ -1,8 +1,10 @@
 import tensorflow as tf
 import numpy as np
+from .BaseOptimizer import BaseOptimizer
 
-class Optimizer:
+class EnergyOptimizerAntipodal(BaseOptimizer):
     def __init__(self, points, k=10000, learning_rate=0.0001, num_epochs=10000):
+        super().__init__()
         self.n = len(points)
         assert self.n % 2 == 0, "Number of points must be even."
         self.k = k
