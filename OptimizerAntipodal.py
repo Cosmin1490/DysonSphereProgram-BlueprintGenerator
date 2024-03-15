@@ -51,6 +51,10 @@ class Optimizer:
                 if loss.numpy() < self.best_loss:
                     self.best_x.assign(self.x.value())
                     self.best_loss = loss.numpy()
+                if (epoch + 1) % 10000 == 0:
+                    updated_points = self.get_updated_points()
+                    with open('stage1.txt', 'w') as f:
+                        np.savetxt(f, updated_points)
 
                 print(f'Epoch {epoch + 1}, Loss: {loss.numpy()}')
         except KeyboardInterrupt:

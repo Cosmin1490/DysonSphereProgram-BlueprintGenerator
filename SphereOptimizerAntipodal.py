@@ -41,6 +41,10 @@ class SphereOptimizer:
 
                 if epoch % 100 == 0:
                     print(f'Epoch {epoch + 1}, Loss: {loss}')
+                if (epoch + 1) % 10000 == 0:
+                    updated_points = self.get_updated_points()
+                    with open('stage2.txt', 'w') as f:
+                        np.savetxt(f, updated_points)
         except KeyboardInterrupt:
             print("Optimization stopped by user.")
 
