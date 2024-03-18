@@ -20,22 +20,8 @@ from Polyhedron import Polyhedron
 import optimizers as opt
 
 
-#points  = np.random.rand(642, 3)
-#points  = np.random.rand(2647, 3)
-points  = np.random.rand(2648, 3)
-#with open('./saves/stage1.txt', 'r') as f:
-#    points = np.loadtxt(f)
-#
-#optimizer = opt.EnergyOptimizerAntipodal(points, num_epochs=30000)
-#optimizer.optimize()
-#points = optimizer.get_updated_points()
-
-with open('./saves/stage2.txt', 'r') as f:
-    points = np.loadtxt(f)
-
-Polyhedron([point.tolist() for point in points], []).plot_polyhedron()
-
-optimizer = opt.EuclidianDistanceAntipodalOptimizer(points, num_epochs=10000000)
+points  = np.random.rand(42, 3)
+optimizer = opt.EnergyOptimizer(points, num_epochs=30000)
 optimizer.optimize()
 points = optimizer.get_updated_points()
 
@@ -59,16 +45,13 @@ unique_faces = [face.tolist() for face in unique_faces]
 
 # Create the Polyhedron using the original vertices and unique_faces
 polyhedron = Polyhedron(points, unique_faces)
-#polyhedron = Polyhedron(points, [])
-#polyhedron.dual_operator()
 
-polyhedron.plot_polyhedron()
 polyhedron = DSPBlueprintValidator.correct_polyhedron(polyhedron)
-polyhedron.plot_polyhedron()
 
 if not DSPBlueprintValidator.validate_polyhedron(polyhedron):
     print("The polyhedron cannot be created within the game.")
     exit(1)
+#polyhedron.plot_polyhedron()
 
 nodes = []
 frames = []
