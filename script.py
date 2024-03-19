@@ -19,15 +19,15 @@ from Polyhedron import Polyhedron
 
 import optimizers as opt
 
-points = np.random.rand(2802, 3)
-optimizer = opt.EnergyOptimizerAntipodal(points, num_epochs=50000)
-optimizer.optimize()
-points = optimizer.get_updated_points()
+#points = np.random.rand(2802, 3)
+#optimizer = opt.EnergyOptimizerAntipodal(points, num_epochs=50000)
+#optimizer.optimize()
+#points = optimizer.get_updated_points()
 
-polyhedron = Polyhedron(points, [])
-polyhedron.plot_polyhedron()
+#polyhedron = Polyhedron(points, [])
+#polyhedron.plot_polyhedron()
 
-#points  = np.loadtxt("./saves/stage2.txt")
+points  = np.loadtxt("./saves/stage2.txt")
 #points = polyhedron.vertices
 optimizer = opt.EuclidianDistanceAntipodalOptimizer(points, num_epochs=1000000)
 optimizer.optimize()
