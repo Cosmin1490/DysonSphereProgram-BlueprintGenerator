@@ -53,7 +53,6 @@ unique_faces = [face.tolist() for face in unique_faces]
 
 # Create the Polyhedron using the original vertices and unique_faces
 polyhedron = Polyhedron(points, unique_faces)
-polyhedron.dual_operator()
 
 polyhedron.plot_polyhedron()
 polyhedron = DSPBlueprintValidator.correct_polyhedron(polyhedron)
