@@ -1,3 +1,4 @@
 from .EnergyOptimizer import EnergyOptimizer
 from .EnergyOptimizerAntipodal import EnergyOptimizerAntipodal
+from .EnergyOptimizerRotational import EnergyOptimizerRotational
 from .EuclidianDistanceAntipodalOptimizer import EuclidianDistanceAntipodalOptimizer
