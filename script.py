@@ -19,9 +19,17 @@ from Polyhedron import Polyhedron
 
 import optimizers as opt
 
+points = np.random.rand(2802, 3)
+optimizer = opt.EnergyOptimizerAntipodal(points, num_epochs=50000)
+optimizer.optimize()
+points = optimizer.get_updated_points()
 
-points  = np.random.rand(42, 3)
-optimizer = opt.EnergyOptimizer(points, num_epochs=30000)
+polyhedron = Polyhedron(points, [])
+polyhedron.plot_polyhedron()
+
+#points  = np.loadtxt("./saves/stage2.txt")
+#points = polyhedron.vertices
+optimizer = opt.EuclidianDistanceAntipodalOptimizer(points, num_epochs=1000000)
 optimizer.optimize()
 points = optimizer.get_updated_points()
 
@@ -45,8 +53,11 @@ unique_faces = [face.tolist() for face in unique_faces]
 
 # Create the Polyhedron using the original vertices and unique_faces
 polyhedron = Polyhedron(points, unique_faces)
+polyhedron.dual_operator()
 
+polyhedron.plot_polyhedron()
 polyhedron = DSPBlueprintValidator.correct_polyhedron(polyhedron)
+polyhedron.plot_polyhedron()
 
 if not DSPBlueprintValidator.validate_polyhedron(polyhedron):
     print("The polyhedron cannot be created within the game.")
