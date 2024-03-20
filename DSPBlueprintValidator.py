@@ -6,10 +6,14 @@ from Polyhedron import Polyhedron
 
 class DSPBlueprintValidator:
     #TODO
+    # edges:
     #        if (magnitude > 0.518f)
     #    {
     #        return BuildCondition.TooLong;
     #    }
+    #TODO:
+    # shell, sqr distance to centroid of face: (num * 0.6f))
+    # num = 0.268324f;
 
     @staticmethod
     def validate_vertices(polyhedron, min_distance=0.00511225):
