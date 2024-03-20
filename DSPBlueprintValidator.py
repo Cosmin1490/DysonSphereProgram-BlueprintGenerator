@@ -5,6 +5,11 @@ from scipy.spatial import KDTree
 from Polyhedron import Polyhedron
 
 class DSPBlueprintValidator:
+    #TODO
+    #        if (magnitude > 0.518f)
+    #    {
+    #        return BuildCondition.TooLong;
+    #    }
 
     @staticmethod
     def validate_vertices(polyhedron, min_distance=0.00511225):
