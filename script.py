@@ -20,38 +20,42 @@ from Polyhedron import Polyhedron
 import optimizers as opt
 
 
-points  = np.random.rand(42, 3)
-optimizer = opt.EnergyOptimizer(points, num_epochs=30000)
-optimizer.optimize()
-points = optimizer.get_updated_points()
-
-points = [point.tolist() for point in points]
-
-delaunay = Delaunay(points)
-
-# Get the faces by creating the convex hull of the Delaunay triangulation
-hull = ConvexHull(delaunay.points)
-
-# Deduplicate faces using a dictionary
-face_dict = {}
-for face in hull.simplices:
-    sorted_face_tuple = tuple(sorted(face))
-    if sorted_face_tuple not in face_dict:
-        face_dict[sorted_face_tuple] = face
-
-unique_faces = list(face_dict.values())
-unique_faces = [face.tolist() for face in unique_faces]
+#points  = np.random.rand(42, 3)
+#optimizer = opt.EnergyOptimizer(points, num_epochs=30000)
+#optimizer.optimize()
+#points = optimizer.get_updated_points()
+#
+#points = [point.tolist() for point in points]
+#
+#delaunay = Delaunay(points)
+#
+## Get the faces by creating the convex hull of the Delaunay triangulation
+#hull = ConvexHull(delaunay.points)
+#
+## Deduplicate faces using a dictionary
+#face_dict = {}
+#for face in hull.simplices:
+#    sorted_face_tuple = tuple(sorted(face))
+#    if sorted_face_tuple not in face_dict:
+#        face_dict[sorted_face_tuple] = face
+#
+#unique_faces = list(face_dict.values())
+#unique_faces = [face.tolist() for face in unique_faces]
 
 
 # Create the Polyhedron using the original vertices and unique_faces
-polyhedron = Polyhedron(points, unique_faces)
+#polyhedron = Polyhedron(points, unique_faces)
+
+with open("./polyhedronisme/polyhedronisme-A10du3I.obj", 'r') as file:
+    file_content = file.read()
+    polyhedron = Polyhedron.create_from_polyhedronisme_obj_file(file_content);
 
 polyhedron = DSPBlueprintValidator.correct_polyhedron(polyhedron)
 
 if not DSPBlueprintValidator.validate_polyhedron(polyhedron):
     print("The polyhedron cannot be created within the game.")
     exit(1)
-#polyhedron.plot_polyhedron()
+polyhedron.plot_polyhedron()
 
 nodes = []
 frames = []
