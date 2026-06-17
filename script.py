@@ -29,8 +29,13 @@ points = optimizer.get_updated_points()
 
 # Stage 2: threshold penalty to fix violations
 optimizer2 = opt.ThresholdPenaltyOptimizer(points, num_epochs=100000)
-#optimizer2.optimize()
+optimizer2.optimize()
 points = optimizer2.get_updated_points()
+
+# Stage 3: basin hopping to escape local minima
+optimizer3 = opt.PerturbOptimizer(points, num_rounds=100)
+optimizer3.optimize()
+points = optimizer3.get_updated_points()
 
 points = [point.tolist() for point in points]
 

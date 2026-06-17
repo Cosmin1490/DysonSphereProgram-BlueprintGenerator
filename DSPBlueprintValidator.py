@@ -10,6 +10,7 @@ class DSPBlueprintValidator:
     MIN_NODE_DISTANCE_SQ = 0.00511225       # UIDysonBrush_Node.RecalcCollides
     MAX_FRAME_LENGTH = 0.518                 # UIDysonBrush_Frame.CheckCondition
     MIN_NODE_FRAME_DISTANCE_SQ = 0.00275625  # UIDysonBrush_Node.CheckCondition
+    MIN_FRAME_FRAME_DISTANCE_SQ = 0.00275625 # UIDysonBrush_Frame.CheckCondition (segment-to-segment)
 
     @staticmethod
     def validate_vertices(polyhedron, min_distance=0.00511225):
@@ -42,53 +43,71 @@ class DSPBlueprintValidator:
     def validate_frame_crossings(polyhedron):
         """Check that no two non-adjacent frames (edges) intersect on the sphere.
 
-        The game checks crossings on frame segments (subdivided arcs). For full
-        node-to-node edges, we verify the actual intersection point of the two
-        great circles lies within both arc segments.
+        Uses KDTree on edge midpoints to skip far-apart pairs.
         """
         vertices = Polyhedron.project_to_sphere(polyhedron.vertices, 1)
         edges = polyhedron.edges
+        vertices_arr = np.array(vertices)
+
+        # Precompute edge midpoints, normals, and endpoint arrays
+        edge_midpoints = []
+        edge_normals = []
+        edge_endpoints = []
+        max_edge_len = 0.0
+
+        for edge in edges:
+            a1 = vertices_arr[edge[0]]
+            a2 = vertices_arr[edge[1]]
+            mid = (a1 + a2) / 2
+            mid_norm = np.linalg.norm(mid)
+            if mid_norm > 1e-10:
+                mid = mid / mid_norm
+            edge_midpoints.append(mid)
+
+            normal = np.cross(a1, a2)
+            norm_n = np.linalg.norm(normal)
+            if norm_n > 1e-10:
+                normal = normal / norm_n
+            edge_normals.append(normal)
+            edge_endpoints.append((a1, a2))
+
+            edge_len = np.linalg.norm(a1 - a2)
+            if edge_len > max_edge_len:
+                max_edge_len = edge_len
+
+        # Two edges can only cross if their midpoints are within max_edge_length of each other
+        search_radius = max_edge_len * 2
+        tree = KDTree(edge_midpoints)
 
         for i in range(len(edges)):
-            a1 = np.array(vertices[edges[i][0]])
-            a2 = np.array(vertices[edges[i][1]])
-            normal_a = np.cross(a1, a2)
-            norm_na = np.linalg.norm(normal_a)
-            if norm_na < 1e-10:
+            nearby = tree.query_ball_point(edge_midpoints[i], search_radius)
+            a1, a2 = edge_endpoints[i]
+            normal_a = edge_normals[i]
+            if np.linalg.norm(np.cross(a1, a2)) < 1e-10:
                 continue
-            normal_a = normal_a / norm_na
 
-            for j in range(i + 1, len(edges)):
-                # Skip adjacent edges (they share a vertex)
+            for j in nearby:
+                if j <= i:
+                    continue
                 if edges[i][0] in edges[j] or edges[i][1] in edges[j]:
                     continue
 
-                b1 = np.array(vertices[edges[j][0]])
-                b2 = np.array(vertices[edges[j][1]])
-                normal_b = np.cross(b1, b2)
-                norm_nb = np.linalg.norm(normal_b)
-                if norm_nb < 1e-10:
+                b1, b2 = edge_endpoints[j]
+                normal_b = edge_normals[j]
+                if np.linalg.norm(np.cross(b1, b2)) < 1e-10:
                     continue
-                normal_b = normal_b / norm_nb
 
-                # Intersection line of the two great circle planes
                 cross_line = np.cross(normal_a, normal_b)
                 norm_cl = np.linalg.norm(cross_line)
                 if norm_cl < 1e-10:
-                    continue  # Great circles are parallel/identical
+                    continue
                 cross_line = cross_line / norm_cl
 
-                # Two candidate intersection points on the sphere
                 for candidate in [cross_line, -cross_line]:
-                    # Check if candidate lies within arc A (between a1 and a2)
-                    # Using: dot(cross(a1, candidate), normal_a) >= 0
-                    #    and dot(cross(candidate, a2), normal_a) >= 0
                     in_a = (np.dot(np.cross(a1, candidate), normal_a) >= -1e-9 and
                             np.dot(np.cross(candidate, a2), normal_a) >= -1e-9)
                     if not in_a:
                         continue
-
-                    # Check if candidate lies within arc B (between b1 and b2)
                     in_b = (np.dot(np.cross(b1, candidate), normal_b) >= -1e-9 and
                             np.dot(np.cross(candidate, b2), normal_b) >= -1e-9)
                     if in_b:
@@ -120,21 +139,116 @@ class DSPBlueprintValidator:
         """Check that no node is too close to a non-adjacent frame segment.
 
         Game code: PointToSegmentSqr(begin, end, point) < 0.00275625f
+
+        Uses KDTree on edge midpoints to skip far-apart node-edge pairs.
         """
         vertices = Polyhedron.project_to_sphere(polyhedron.vertices, 1)
         edges = polyhedron.edges
+        vertices_arr = np.array(vertices)
+
+        # Precompute edge midpoints and max edge half-length
+        edge_midpoints = []
+        max_half_len = 0.0
+        for edge in edges:
+            a = vertices_arr[edge[0]]
+            b = vertices_arr[edge[1]]
+            mid = (a + b) / 2
+            mid_norm = np.linalg.norm(mid)
+            if mid_norm > 1e-10:
+                mid = mid / mid_norm
+            edge_midpoints.append(mid)
+            half_len = np.linalg.norm(a - b) / 2
+            if half_len > max_half_len:
+                max_half_len = half_len
+
+        tree = KDTree(edge_midpoints)
+        # A node can only violate proximity if it's within sqrt(min_distance_sq) + half edge length
+        search_radius = np.sqrt(min_distance_sq) + max_half_len
 
         for vi in range(len(vertices)):
-            point = np.array(vertices[vi])
-            for edge in edges:
-                # Skip edges that contain this vertex
+            point = vertices_arr[vi]
+            nearby = tree.query_ball_point(point, search_radius)
+            for ei in nearby:
+                edge = edges[ei]
                 if vi == edge[0] or vi == edge[1]:
                     continue
-                begin = np.array(vertices[edge[0]])
-                end = np.array(vertices[edge[1]])
+                begin = vertices_arr[edge[0]]
+                end = vertices_arr[edge[1]]
                 sq_dist = DSPBlueprintValidator._point_to_segment_sq(begin, end, point)
                 if sq_dist < min_distance_sq:
                     return False
+        return True
+
+    @staticmethod
+    def validate_frame_frame_proximity(polyhedron, min_distance_sq=0.00275625):
+        """Check that no two non-adjacent frames are too close to each other.
+
+        Game code: For each pair of non-adjacent frames, checks
+        PointToSegmentSqr(existing_begin, existing_end, new_point) < 0.00275625f
+        for sample points along the new frame against segments of existing frames.
+
+        For non-Euler frames each frame is a single segment [begin, end], so the
+        check reduces to testing each endpoint of frame A against the segment of
+        frame B (skipping endpoints that are shared nodes).
+
+        Uses KDTree on edge midpoints to skip far-apart pairs.
+        """
+        vertices = Polyhedron.project_to_sphere(polyhedron.vertices, 1)
+        edges = polyhedron.edges
+        vertices_arr = np.array(vertices)
+
+        # Precompute edge midpoints and max edge length
+        edge_midpoints = []
+        max_edge_len = 0.0
+        for edge in edges:
+            a = vertices_arr[edge[0]]
+            b = vertices_arr[edge[1]]
+            mid = (a + b) / 2
+            mid_norm = np.linalg.norm(mid)
+            if mid_norm > 1e-10:
+                mid = mid / mid_norm
+            edge_midpoints.append(mid)
+            edge_len = np.linalg.norm(a - b)
+            if edge_len > max_edge_len:
+                max_edge_len = edge_len
+
+        tree = KDTree(edge_midpoints)
+        # Two edges can only be close if midpoints are within range
+        search_radius = max_edge_len + np.sqrt(min_distance_sq)
+
+        for i in range(len(edges)):
+            nearby = tree.query_ball_point(edge_midpoints[i], search_radius)
+            a1 = vertices_arr[edges[i][0]]
+            a2 = vertices_arr[edges[i][1]]
+
+            for j in nearby:
+                if j <= i:
+                    continue
+                # Skip if frames share a node (adjacent)
+                shared_nodes = set(edges[i]) & set(edges[j])
+                if len(shared_nodes) == 2:
+                    continue  # same edge
+
+                b1 = vertices_arr[edges[j][0]]
+                b2 = vertices_arr[edges[j][1]]
+
+                # Check endpoints of frame A against segment of frame B
+                # Skip endpoint if it's a shared node (game skips these via flag2-flag5)
+                if edges[i][0] not in shared_nodes:
+                    if DSPBlueprintValidator._point_to_segment_sq(b1, b2, a1) < min_distance_sq:
+                        return False
+                if edges[i][1] not in shared_nodes:
+                    if DSPBlueprintValidator._point_to_segment_sq(b1, b2, a2) < min_distance_sq:
+                        return False
+
+                # Check endpoints of frame B against segment of frame A
+                if edges[j][0] not in shared_nodes:
+                    if DSPBlueprintValidator._point_to_segment_sq(a1, a2, b1) < min_distance_sq:
+                        return False
+                if edges[j][1] not in shared_nodes:
+                    if DSPBlueprintValidator._point_to_segment_sq(a1, a2, b2) < min_distance_sq:
+                        return False
+
         return True
 
     @staticmethod
@@ -149,6 +263,7 @@ class DSPBlueprintValidator:
             'frame_length': DSPBlueprintValidator.validate_frame_lengths(polyhedron),
             'frame_crossings': DSPBlueprintValidator.validate_frame_crossings(polyhedron),
             'node_frame_proximity': DSPBlueprintValidator.validate_node_frame_proximity(polyhedron),
+            'frame_frame_proximity': DSPBlueprintValidator.validate_frame_frame_proximity(polyhedron),
         }
         results['all_valid'] = all(results.values())
         return results

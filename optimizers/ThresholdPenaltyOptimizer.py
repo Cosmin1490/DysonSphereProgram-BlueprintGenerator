@@ -14,19 +14,24 @@ class ThresholdPenaltyOptimizer(BaseOptimizer):
 
     Loss = energy_weight * coulomb_repulsion
          + penalty_weight * sum(max(0, threshold - sq_dist)^2)
+         + softmin_weight * softmin(sq_dists)
          + surface_weight * surface_constraint
     """
 
     def __init__(self, points, min_distance=0.00511225, energy_weight=1.0,
-                 penalty_weight=1e6, surface_weight=10000,
-                 learning_rate=0.001, num_epochs=10000):
+                 penalty_weight=1e6, softmin_weight=1e4, softmin_alpha=500.0,
+                 surface_weight=10000,
+                 learning_rate=0.001, num_epochs=10000, verbose=True):
         super().__init__()
         self.n = len(points)
+        self.verbose = verbose
         self.min_distance = min_distance
         self.initial_energy_weight = energy_weight
         self.initial_penalty_weight = penalty_weight
         self.energy_weight = tf.Variable(energy_weight, dtype=tf.float64)
         self.penalty_weight = tf.Variable(penalty_weight, dtype=tf.float64)
+        self.softmin_weight = softmin_weight
+        self.softmin_alpha = softmin_alpha
         self.surface_weight = surface_weight
         self.x = tf.Variable(points, dtype=tf.float64)
         self.num_epochs = num_epochs
@@ -67,12 +72,19 @@ class ThresholdPenaltyOptimizer(BaseOptimizer):
         violation = violation * mask
         penalty = tf.reduce_sum(violation * violation) / 2
 
+        # --- Softmin term (preemptive pressure on near-violations) ---
+        # Smooth approximation of min(sq_dists) that sends gradients to
+        # the ~10-20 closest pairs, not just the single worst one
+        masked_sq_dists = sq_dists + tf.eye(self.n, dtype=tf.float64) * 1e6
+        softmin = -tf.reduce_logsumexp(-self.softmin_alpha * masked_sq_dists) / self.softmin_alpha
+
         # --- Surface constraint (stay on unit sphere) ---
         norms = tf.sqrt(tf.linalg.diag_part(tf.matmul(self.x, tf.transpose(self.x))) + epsilon)
         surface = tf.reduce_sum((norms - 1.0) ** 2)
 
         loss = (self.energy_weight * energy
                 + self.penalty_weight * penalty
+                - self.softmin_weight * softmin
                 + self.surface_weight * surface) / self.n
         return loss
 
@@ -100,9 +112,9 @@ class ThresholdPenaltyOptimizer(BaseOptimizer):
         self.energy_weight.assign(
             self.initial_energy_weight * (1.0 - 0.99 * progress)
         )
-        # Penalty weight grows from initial to 100x initial
+        # Penalty weight grows exponentially: initial -> 1000x initial
         self.penalty_weight.assign(
-            self.initial_penalty_weight * (1.0 + 99.0 * progress)
+            self.initial_penalty_weight * (10.0 ** (3.0 * progress))
         )
 
     def optimize(self):
@@ -120,18 +132,20 @@ class ThresholdPenaltyOptimizer(BaseOptimizer):
                         self.best_min_dist = min_sq_dist
                         self.best_x.assign(self.x.value())
 
-                    print(f'Epoch {epoch + 1}, Loss: {loss.numpy():.6f}, '
-                          f'Min sq dist: {min_sq_dist:.8f} / {self.min_distance} '
-                          f'[{status}] (best: {self.best_min_dist:.8f}) '
-                          f'[E:{self.energy_weight.numpy():.4f} P:{self.penalty_weight.numpy():.0f}]')
+                    if self.verbose:
+                        print(f'Epoch {epoch + 1}, Loss: {loss.numpy():.6f}, '
+                              f'Min sq dist: {min_sq_dist:.8f} / {self.min_distance} '
+                              f'[{status}] (best: {self.best_min_dist:.8f}) '
+                              f'[E:{self.energy_weight.numpy():.4f} P:{self.penalty_weight.numpy():.0f}]')
 
-                if (epoch + 1) % 10000 == 0:
+                if self.verbose and (epoch + 1) % 10000 == 0:
                     updated_points = self.get_updated_points()
                     with open('./saves/threshold_penalty.txt', 'w') as f:
                         np.savetxt(f, updated_points)
         except KeyboardInterrupt:
-            print("Optimization stopped by user.")
-            print(f"Best min sq distance: {self.best_min_dist:.8f}")
+            if self.verbose:
+                print("Optimization stopped by user.")
+                print(f"Best min sq distance: {self.best_min_dist:.8f}")
 
     def get_updated_points(self):
         return self.best_x.numpy()
