@@ -1,3 +1,4 @@
 from .EnergyOptimizer import EnergyOptimizer
 from .EnergyOptimizerAntipodal import EnergyOptimizerAntipodal
 from .EuclidianDistanceAntipodalOptimizer import EuclidianDistanceAntipodalOptimizer
+from .ThresholdPenaltyOptimizer import ThresholdPenaltyOptimizer

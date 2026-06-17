@@ -20,10 +20,17 @@ from Polyhedron import Polyhedron
 import optimizers as opt
 
 
-points  = np.random.rand(42, 3)
+# Stage 1: energy optimizer for global structure
+#points  = np.random.rand(200, 3)
+points  = np.random.rand(2582, 3)
 optimizer = opt.EnergyOptimizer(points, num_epochs=30000)
 optimizer.optimize()
 points = optimizer.get_updated_points()
+
+# Stage 2: threshold penalty to fix violations
+optimizer2 = opt.ThresholdPenaltyOptimizer(points, num_epochs=100000)
+#optimizer2.optimize()
+points = optimizer2.get_updated_points()
 
 points = [point.tolist() for point in points]
 
@@ -48,7 +55,17 @@ polyhedron = Polyhedron(points, unique_faces)
 
 polyhedron = DSPBlueprintValidator.correct_polyhedron(polyhedron)
 
-if not DSPBlueprintValidator.validate_polyhedron(polyhedron):
+validation = DSPBlueprintValidator.validate_all(polyhedron)
+print("\n=== Validation Results ===")
+for check, passed in validation.items():
+    if check != 'all_valid':
+        status = "PASS" if passed else "FAIL"
+        print(f"  {check}: {status}")
+print(f"  Overall: {'ALL PASSED' if validation['all_valid'] else 'FAILED'}")
+print()
+
+polyhedron.plot_polyhedron()
+if not validation['all_valid']:
     print("The polyhedron cannot be created within the game.")
     exit(1)
 #polyhedron.plot_polyhedron()

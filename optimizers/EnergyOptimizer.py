@@ -3,14 +3,20 @@ import numpy as np
 from .BaseOptimizer import BaseOptimizer
 
 class EnergyOptimizer(BaseOptimizer):
-    def __init__(self, points, k=10000, learning_rate=0.0001, num_epochs=10000):
+    def __init__(self, points, k=10000, learning_rate=0.001, num_epochs=10000):
         super().__init__()
         self.n = len(points)
         self.k = k
         self.x = tf.Variable(points, dtype=tf.float64)
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
         self.num_epochs = num_epochs
+        lr_schedule = tf.keras.optimizers.schedules.CosineDecay(
+            initial_learning_rate=learning_rate,
+            decay_steps=num_epochs,
+            alpha=learning_rate * 0.001
+        )
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=lr_schedule)
 
+    @tf.function
     def compute_loss(self):
         epsilon = 1e-7
         tf_S = tf.matmul(self.x, tf.transpose(self.x))
@@ -25,14 +31,20 @@ class EnergyOptimizer(BaseOptimizer):
         L_tf = (tf.reduce_sum(tf_rec_pq_dist) / 2 + self.k * tf.reduce_sum(tf_surface_dist_sq)) / self.n
         return L_tf
 
+    @tf.function
+    def _train_step(self):
+        with tf.GradientTape() as tape:
+            loss = self.compute_loss()
+        gradients = tape.gradient(loss, [self.x])
+        self.optimizer.apply_gradients(zip(gradients, [self.x]))
+        return loss
+
     def optimize(self):
         try:
             for epoch in range(self.num_epochs):
-                with tf.GradientTape() as tape:
-                    loss = self.compute_loss()
-                gradients = tape.gradient(loss, [self.x])
-                self.optimizer.apply_gradients(zip(gradients, [self.x]))
-                print(f'Epoch {epoch + 1}, Loss: {loss.numpy()}')
+                loss = self._train_step()
+                if (epoch + 1) % 100 == 0:
+                    print(f'Epoch {epoch + 1}, Loss: {loss.numpy()}')
         except KeyboardInterrupt:
             print("Optimization stopped by user.")
 
