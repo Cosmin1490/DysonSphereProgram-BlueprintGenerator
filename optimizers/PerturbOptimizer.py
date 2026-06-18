@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 from scipy.spatial import KDTree
 from .BaseOptimizer import BaseOptimizer
 from .ThresholdPenaltyOptimizer import ThresholdPenaltyOptimizer
@@ -17,8 +18,8 @@ class PerturbOptimizer(BaseOptimizer):
     """
 
     def __init__(self, points, min_distance=0.00511225, num_rounds=100,
-                 top_k_pairs=20, initial_perturb_scale=0.02,
-                 perturb_decay=0.95, reopt_epochs=5000):
+                 top_k_pairs=20, initial_perturb_scale=0.03,
+                 perturb_decay=0.97, reopt_epochs=20000):
         super().__init__()
         self.points = np.array(points, dtype=np.float64)
         self.min_distance = min_distance
@@ -65,7 +66,7 @@ class PerturbOptimizer(BaseOptimizer):
             for round_num in range(self.num_rounds):
                 scale = max(
                     self.initial_perturb_scale * (self.perturb_decay ** round_num),
-                    0.002  # floor: don't let perturbation become negligible
+                    0.008  # floor: don't let perturbation become negligible
                 )
 
                 # Find the bottleneck nodes
@@ -81,7 +82,7 @@ class PerturbOptimizer(BaseOptimizer):
 
                 # Reoptimize with fresh optimizer state
                 opt = ThresholdPenaltyOptimizer(
-                    candidate,
+                    np.array(candidate, dtype=np.float64),
                     min_distance=self.min_distance,
                     num_epochs=self.reopt_epochs,
                     energy_weight=0.1,
@@ -93,6 +94,8 @@ class PerturbOptimizer(BaseOptimizer):
                 )
                 opt.optimize()
                 result = opt.get_updated_points()
+                del opt
+                tf.keras.backend.clear_session()
 
                 new_min_dist = self._compute_min_sq_distance(result)
 
