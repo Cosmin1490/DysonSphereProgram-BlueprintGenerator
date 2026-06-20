@@ -18,8 +18,8 @@ class PerturbOptimizer(BaseOptimizer):
     """
 
     def __init__(self, points, min_distance=0.00511225, num_rounds=100,
-                 top_k_pairs=20, initial_perturb_scale=0.03,
-                 perturb_decay=0.97, reopt_epochs=20000):
+                 top_k_pairs=80, initial_perturb_scale=0.03,
+                 perturb_decay=0.97, reopt_epochs=3000):
         super().__init__()
         self.points = np.array(points, dtype=np.float64)
         self.min_distance = min_distance
