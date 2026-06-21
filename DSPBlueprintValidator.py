@@ -11,6 +11,7 @@ class DSPBlueprintValidator:
     MAX_FRAME_LENGTH = 0.518                 # UIDysonBrush_Frame.CheckCondition
     MIN_NODE_FRAME_DISTANCE_SQ = 0.00275625  # UIDysonBrush_Node.CheckCondition
     MIN_FRAME_FRAME_DISTANCE_SQ = 0.00275625 # UIDysonBrush_Frame.CheckCondition (segment-to-segment)
+    MAX_SHELL_CENTROID_DISTANCE_SQ = 0.1609944 # UIDysonBrush_Shell._OnUpdate (0.268324f * 0.6f)
 
     @staticmethod
     def validate_vertices(polyhedron, min_distance=0.00511225):
@@ -252,6 +253,35 @@ class DSPBlueprintValidator:
         return True
 
     @staticmethod
+    def validate_shell_size(polyhedron, max_distance_sq=0.1609944):
+        """Check that no shell face is too large (vertex too far from face centroid).
+
+        Game code (UIDysonBrush_Shell._OnUpdate):
+            centroid = Normalize(sum of vertex positions)
+            for each vertex: if (centroid - vertex.normalized).sqrMagnitude > 0.268324f * 0.6f -> CycleTooLarge
+        """
+        vertices = Polyhedron.project_to_sphere(polyhedron.vertices, 1)
+        vertices_arr = np.array(vertices)
+
+        for face in polyhedron.faces:
+            # Centroid = normalized sum of face vertex positions
+            face_vertices = vertices_arr[face]
+            centroid = np.sum(face_vertices, axis=0)
+            centroid_norm = np.linalg.norm(centroid)
+            if centroid_norm < 1e-10:
+                return False
+            centroid = centroid / centroid_norm
+
+            # Check each vertex distance to centroid
+            for vi in face:
+                diff = centroid - vertices_arr[vi]
+                sq_dist = np.dot(diff, diff)
+                if sq_dist > max_distance_sq:
+                    return False
+
+        return True
+
+    @staticmethod
     def validate_polyhedron(polyhedron, min_distance=0.00511225):
         return DSPBlueprintValidator.validate_vertices(polyhedron, min_distance)
 
@@ -264,6 +294,7 @@ class DSPBlueprintValidator:
             'frame_crossings': DSPBlueprintValidator.validate_frame_crossings(polyhedron),
             'node_frame_proximity': DSPBlueprintValidator.validate_node_frame_proximity(polyhedron),
             'frame_frame_proximity': DSPBlueprintValidator.validate_frame_frame_proximity(polyhedron),
+            'shell_size': DSPBlueprintValidator.validate_shell_size(polyhedron),
         }
         results['all_valid'] = all(results.values())
         return results
