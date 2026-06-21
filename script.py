@@ -20,25 +20,15 @@ from Polyhedron import Polyhedron
 import optimizers as opt
 
 
-# # Stage 1: energy optimizer for global structure
-# #points  = np.random.rand(200, 3)
-# points  = np.random.rand(2582, 3)
-# optimizer = opt.EnergyOptimizer(points, num_epochs=30000)
-# optimizer.optimize()
-# points = optimizer.get_updated_points()
-#
-# # Stage 2: threshold penalty to fix violations
-# optimizer2 = opt.ThresholdPenaltyOptimizer(points, num_epochs=100000)
-# optimizer2.optimize()
-# points = optimizer2.get_updated_points()
+# Stage 1: Fibonacci sphere (analytical, instant)
+generator = opt.FibonacciSphereGenerator(n=2582)
+generator.optimize()
+points = generator.get_updated_points()
 
-# Resume from Stage 3 checkpoint
-points = np.loadtxt('./saves/perturb.txt')
-
-# Stage 3: basin hopping to escape local minima
-optimizer3 = opt.PerturbOptimizer(points, num_rounds=100)
-optimizer3.optimize()
-points = optimizer3.get_updated_points()
+# Stage 2: threshold penalty to fix violations
+optimizer2 = opt.ThresholdPenaltyOptimizer(points, num_epochs=100000, energy_weight=0.0)
+optimizer2.optimize()
+points = optimizer2.get_updated_points()
 
 points = [point.tolist() for point in points]
 

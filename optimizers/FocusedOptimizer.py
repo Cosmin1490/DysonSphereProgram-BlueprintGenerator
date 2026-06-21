@@ -17,7 +17,7 @@ class FocusedOptimizer(BaseOptimizer):
     """
 
     def __init__(self, points, min_distance=0.00511225, num_rounds=200,
-                 top_k=20, num_epochs=10000, perturb_scale=0.01,
+                 top_k=20, num_epochs=10000, perturb_scale=0.02,
                  penalty_weight=1e7, softmin_weight=1e4, softmin_alpha=500.0,
                  surface_weight=10000, learning_rate=0.001):
         super().__init__()
