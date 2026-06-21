@@ -265,7 +265,7 @@ class DSPBlueprintValidator:
 
         for face in polyhedron.faces:
             # Centroid = normalized sum of face vertex positions
-            face_vertices = vertices_arr[face]
+            face_vertices = vertices_arr[list(face)]
             centroid = np.sum(face_vertices, axis=0)
             centroid_norm = np.linalg.norm(centroid)
             if centroid_norm < 1e-10:
