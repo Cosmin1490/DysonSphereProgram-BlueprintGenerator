@@ -48,10 +48,19 @@ polyhedron = Polyhedron(points, unique_faces)
 
 polyhedron = DSPBlueprintValidator.correct_polyhedron(polyhedron)
 
-if not DSPBlueprintValidator.validate_polyhedron(polyhedron):
+validation = DSPBlueprintValidator.validate_all(polyhedron)
+print("\n=== Validation Results ===")
+for check, passed in validation.items():
+    if check != 'all_valid':
+        status = "PASS" if passed else "FAIL"
+        print(f"  {check}: {status}")
+print(f"  Overall: {'ALL PASSED' if validation['all_valid'] else 'FAILED'}")
+print()
+
+polyhedron.plot_polyhedron()
+if not validation['all_valid']:
     print("The polyhedron cannot be created within the game.")
     exit(1)
-#polyhedron.plot_polyhedron()
 
 nodes = []
 frames = []
