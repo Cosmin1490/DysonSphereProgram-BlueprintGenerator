@@ -28,7 +28,7 @@ class DysonNode:
         self.rid = rid
         self.frameTurn = frameTurn
         self.shellTurn = shellTurn
-        self.color = (np.int8(color[0]), np.int8(color[1]), np.int8(color[2]), np.int8(color[3]))
+        self.color = (np.uint8(color[0]), np.uint8(color[1]), np.uint8(color[2]), np.uint8(color[3]))
         self.spReq = spReq
         self.cpReq = cpReq
 

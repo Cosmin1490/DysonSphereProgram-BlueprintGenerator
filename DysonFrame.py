@@ -26,7 +26,7 @@ class DysonFrame:
         self.spA = spA
         self.spB = spB
         self.spMax = spMax
-        self.color = (np.int8(color[0]), np.int8(color[1]), np.int8(color[2]), np.int8(color[3]))
+        self.color = (np.uint8(color[0]), np.uint8(color[1]), np.uint8(color[2]), np.uint8(color[3]))
 
     @classmethod
     def create_with_defaults(cls, frameId: int, nodeAid: int, nodeBid: int):

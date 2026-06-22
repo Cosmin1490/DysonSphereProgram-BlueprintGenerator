@@ -19,8 +19,8 @@ class BinaryWriter:
             self.file.write(struct.pack('<i', value))
         elif isinstance(value, float):
             self.file.write(struct.pack('<f', value))
-        elif isinstance(value, np.int8):
-            self.file.write(struct.pack('<B', value))
+        elif isinstance(value, (np.int8, np.uint8)):
+            self.file.write(struct.pack('<B', int(value) & 0xFF))
         else:
             raise TypeError(f"Unsupported type: {type(value)}")
 
@@ -31,8 +31,8 @@ class BinaryWriter:
             self.file.write(struct.pack('<i', value).hex())
         elif isinstance(value, float):
             self.file.write(struct.pack('<f', value).hex())
-        elif isinstance(value, np.int8):
-            self.file.write(struct.pack('<B', value).hex())
+        elif isinstance(value, (np.int8, np.uint8)):
+            self.file.write(struct.pack('<B', int(value) & 0xFF).hex())
         else:
             raise TypeError(f"Unsupported type: {type(value)}")
 

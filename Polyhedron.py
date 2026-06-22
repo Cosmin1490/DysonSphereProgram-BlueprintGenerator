@@ -204,7 +204,7 @@ class Polyhedron:
         length = math.sqrt(x**2 + y**2 + z**2)
         x_proj, y_proj, z_proj = radius * x / length, radius * y / length, radius * z / length
 
-        latitude = math.degrees(math.asin(z_proj / radius))
+        latitude = math.degrees(math.asin(y_proj / radius))
         return latitude
 
     def absolute_latitude(self):

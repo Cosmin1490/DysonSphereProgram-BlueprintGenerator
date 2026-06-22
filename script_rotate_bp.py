@@ -64,25 +64,26 @@ n_opt = np.array([math.sin(theta) * math.cos(phi),
                   math.sin(theta) * math.sin(phi),
                   math.cos(theta)])
 
-# Current max |z| on unit sphere
-current_max_z = np.max(np.abs(positions_unit[:, 2]))
-current_lat = math.degrees(math.asin(min(current_max_z, 1.0)))
+# Current max |y| on unit sphere (game uses Y for latitude)
+current_max_y = np.max(np.abs(positions_unit[:, 1]))
+current_lat = math.degrees(math.asin(min(current_max_y, 1.0)))
 optimal_lat = math.degrees(math.asin(min(best_val, 1.0)))
-print(f"\nCurrent max |z|: {current_max_z:.6f} -> latitude: {current_lat:.1f}°")
-print(f"Optimal max |z|: {best_val:.6f} -> latitude: {optimal_lat:.1f}°")
+print(f"\nCurrent max |y|: {current_max_y:.6f} -> latitude: {current_lat:.1f}°")
+print(f"Optimal max |y|: {best_val:.6f} -> latitude: {optimal_lat:.1f}°")
 print(f"Optimal pole axis: [{n_opt[0]:.6f}, {n_opt[1]:.6f}, {n_opt[2]:.6f}]")
 
-# --- Build rotation matrix: rotate n_opt to z-axis ---
-z_axis = np.array([0.0, 0.0, 1.0])
-cross = np.cross(n_opt, z_axis)
+# --- Build rotation matrix: rotate n_opt to y-axis ---
+# Game uses Y-component for latitude (not Z)
+y_axis = np.array([0.0, 1.0, 0.0])
+cross = np.cross(n_opt, y_axis)
 cross_norm = np.linalg.norm(cross)
 
 if cross_norm < 1e-10:
-    # n_opt is already ~z or ~-z
-    if n_opt[2] > 0:
+    # n_opt is already ~y or ~-y
+    if n_opt[1] > 0:
         R = np.eye(3)
     else:
-        R = np.diag([1.0, -1.0, -1.0])  # 180° around x
+        R = np.diag([-1.0, -1.0, 1.0])  # 180° around z
 else:
     k = cross / cross_norm
     cos_a = np.dot(n_opt, z_axis)
@@ -96,12 +97,12 @@ else:
 # Apply rotation to original (non-unit) positions
 rotated = (R @ positions.T).T  # (N, 3)
 
-# Verify on unit sphere
+# Verify on unit sphere (game uses Y for latitude)
 rotated_unit = rotated / np.linalg.norm(rotated, axis=1, keepdims=True)
-new_max_z = np.max(np.abs(rotated_unit[:, 2]))
-new_lat = math.degrees(math.asin(min(new_max_z, 1.0)))
+new_max_y = np.max(np.abs(rotated_unit[:, 1]))
+new_lat = math.degrees(math.asin(min(new_max_y, 1.0)))
 new_max_stress = min(math.ceil(new_lat), 90)
-print(f"\nAfter rotation: max |z|={new_max_z:.6f}, latitude={new_lat:.1f}°, max_stress={new_max_stress}")
+print(f"\nAfter rotation: max |y|={new_max_y:.6f}, latitude={new_lat:.1f}°, max_stress={new_max_stress}")
 
 # --- Re-export blueprint ---
 # Rebuild nodes with rotated positions, keeping all other properties from original
