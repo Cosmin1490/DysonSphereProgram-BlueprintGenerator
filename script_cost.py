@@ -20,7 +20,7 @@ def compute_seg_count(pos_a, pos_b, radius):
     b_norm = b / np.float32(np.linalg.norm(b))
     dot = np.float32(np.clip(np.dot(a_norm, b_norm), -1.0, 1.0))
     angle = np.float32(math.acos(float(dot)))
-    seg_count = int(float((angle * np.float32(radius) / np.float32(600.0) + np.float32(0.5)) * np.float32(2.0)))
+    seg_count = int(float(angle * np.float32(radius) / np.float32(600.0) + np.float32(0.5))) * 2
     if seg_count <= 0:
         seg_count = 2
     return seg_count
