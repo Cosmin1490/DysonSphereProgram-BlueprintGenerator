@@ -5,3 +5,4 @@ from .ThresholdPenaltyOptimizer import ThresholdPenaltyOptimizer
 from .PerturbOptimizer import PerturbOptimizer
 from .FocusedOptimizer import FocusedOptimizer
 from .FibonacciSphereGenerator import FibonacciSphereGenerator
+from .ForceDirectedOptimizer import ForceDirectedOptimizer

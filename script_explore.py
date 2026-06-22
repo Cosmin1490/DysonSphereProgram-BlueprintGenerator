@@ -20,13 +20,13 @@ from Polyhedron import Polyhedron
 import optimizers as opt
 
 
-# Stage 1: Fibonacci sphere (analytical, instant)
-generator = opt.FibonacciSphereGenerator(n=2582)
-generator.optimize()
-points = generator.get_updated_points()
+# Stage 1: Fibonacci start at 2725 nodes
+fib = opt.FibonacciSphereGenerator(n=2725)
+fib.optimize()
+points = fib.get_updated_points()
 
-# Stage 2: threshold penalty to fix violations
-optimizer2 = opt.ThresholdPenaltyOptimizer(points, num_epochs=100000, energy_weight=0.0)
+# Stage 2: Force-directed Tammes optimization
+optimizer2 = opt.ForceDirectedOptimizer(points, num_epochs=500000, initial_step=0.01, decay=0.99999, initial_cutoff_margin=1.1, final_cutoff_margin=1.1)
 optimizer2.optimize()
 points = optimizer2.get_updated_points()
 

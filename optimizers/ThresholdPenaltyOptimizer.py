@@ -30,9 +30,9 @@ class ThresholdPenaltyOptimizer(BaseOptimizer):
         self.initial_penalty_weight = penalty_weight
         self.energy_weight = tf.Variable(energy_weight, dtype=tf.float64)
         self.penalty_weight = tf.Variable(penalty_weight, dtype=tf.float64)
-        self.softmin_weight = softmin_weight
-        self.softmin_alpha = softmin_alpha
-        self.surface_weight = surface_weight
+        self.softmin_weight = tf.constant(softmin_weight, dtype=tf.float64)
+        self.softmin_alpha = tf.constant(softmin_alpha, dtype=tf.float64)
+        self.surface_weight = tf.constant(surface_weight, dtype=tf.float64)
         self.x = tf.Variable(points, dtype=tf.float64)
         self.num_epochs = num_epochs
         lr_schedule = tf.keras.optimizers.schedules.CosineDecay(
@@ -55,7 +55,7 @@ class ThresholdPenaltyOptimizer(BaseOptimizer):
 
     @tf.function
     def compute_loss(self):
-        epsilon = 1e-7
+        epsilon = tf.constant(1e-7, dtype=tf.float64)
 
         sq_dists = self._pairwise_sq_distances(self.x)
 
@@ -75,7 +75,7 @@ class ThresholdPenaltyOptimizer(BaseOptimizer):
         # --- Softmin term (preemptive pressure on near-violations) ---
         # Smooth approximation of min(sq_dists) that sends gradients to
         # the ~10-20 closest pairs, not just the single worst one
-        masked_sq_dists = sq_dists + tf.eye(self.n, dtype=tf.float64) * 1e6
+        masked_sq_dists = sq_dists + tf.eye(self.n, dtype=tf.float64) * tf.constant(1e6, dtype=tf.float64)
         softmin = -tf.reduce_logsumexp(-self.softmin_alpha * masked_sq_dists) / self.softmin_alpha
 
         # --- Surface constraint (stay on unit sphere) ---
