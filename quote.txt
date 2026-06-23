@@ -1,0 +1,1 @@
+"A game about factory automation and the optimal solution turns out to be the same molecule that won the 1996 Nobel Prize in Chemistry. The math doesn't leave any room — not "probably best" or "best we found," but provably optimal down to the geometry of the sphere."
